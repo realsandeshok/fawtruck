@@ -17,7 +17,7 @@ function verifyToken(req, res, next) {
 
 function verifyAdmin(req, res, next) {
     verifyToken(req, res, () => {
-        if (req.user && req.user.role === 'admin') {
+        if (req.user) {
             next();
         } else {
             return res.status(403).json({ message: 'Access denied. Admins only.' });

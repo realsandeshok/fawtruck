@@ -1,0 +1,190 @@
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const multer = require('multer');
+const db = require('../db/db'); // Ensure this is your database connection file
+
+const app = express();
+
+// Directory to store uploaded images
+const UPLOADS_DIR = path.join(__dirname, 'truck_uploads');
+
+// Ensure the uploads directory exists
+if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+
+// Multer configuration
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, UPLOADS_DIR);
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`);
+    },
+});
+
+const upload = multer({
+    storage,
+    fileFilter: (req, file, cb) => {
+        const filetypes = /jpeg|jpg|png|gif/;
+        const mimetype = filetypes.test(file.mimetype);
+        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+
+        if (mimetype && extname) {
+            return cb(null, true);
+        }
+        cb(new Error('Only image files are allowed.'));
+    },
+    limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+});
+
+// API to create a truck model with image upload
+app.post('/trucks', upload.single('image'), async (req, res) => {
+    try {
+        const { truck_name, visibility } = req.body;
+        const image = req.file ? req.file.filename : null;
+
+        // Validate input
+        if (!truck_name || !image) {
+            return res.status(400).json({ message: 'Truck name and image are required.' });
+        }
+
+        // SQL query to insert a new truck model
+        const query = `
+            INSERT INTO truck_models (truck_name, image, visibility)
+            VALUES ($1, $2, $3) RETURNING *;
+        `;
+
+        const result = await db.query(query, [truck_name, image, visibility || false]);
+
+        res.status(201).json({
+            message: 'Truck model created successfully.',
+            truck: result.rows[0],
+        });
+    } catch (err) {
+        console.error('Error creating truck model:', err.message);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+});
+
+// API to fetch all truck models
+app.get('/trucks', async (req, res) => {
+    try {
+        const query = 'SELECT * FROM truck_models ORDER BY id;';
+        const result = await db.query(query);
+
+        res.status(200).json({
+            message: 'Truck models fetched successfully.',
+            trucks: result.rows,
+        });
+    } catch (err) {
+        console.error('Error fetching truck models:', err.message);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+});
+
+// API to fetch a single truck model by ID
+app.get('/trucks/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const query = 'SELECT * FROM truck_models WHERE id = $1;';
+        const result = await db.query(query, [id]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Truck model not found.' });
+        }
+
+        res.status(200).json({
+            message: 'Truck model fetched successfully.',
+            truck: result.rows[0],
+        });
+    } catch (err) {
+        console.error('Error fetching truck model:', err.message);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+});
+
+// API to update a truck model by ID
+app.put('/trucks/:id', upload.single('image'), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { truck_name, visibility } = req.body;
+        const image = req.file ? req.file.filename : null;
+
+        // Validate input
+        if (!truck_name) {
+            return res.status(400).json({ message: 'Truck name is required.' });
+        }
+
+        let query, params;
+        if (image) {
+            query = `
+                UPDATE truck_models
+                SET truck_name = $1, image = $2, visibility = $3
+                WHERE id = $4 RETURNING *;
+            `;
+            params = [truck_name, image, visibility, id];
+        } else {
+            query = `
+                UPDATE truck_models
+                SET truck_name = $1, visibility = $2
+                WHERE id = $3 RETURNING *;
+            `;
+            params = [truck_name, visibility, id];
+        }
+
+        const result = await db.query(query, params);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Truck model not found.' });
+        }
+
+        res.status(200).json({
+            message: 'Truck model updated successfully.',
+            truck: result.rows[0],
+        });
+    } catch (err) {
+        console.error('Error updating truck model:', err.message);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+});
+
+// API to delete a truck model by ID
+app.delete('/trucks/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Get the truck to delete the image file
+        const selectQuery = 'SELECT image FROM truck_models WHERE id = $1;';
+        const selectResult = await db.query(selectQuery, [id]);
+
+        if (selectResult.rowCount === 0) {
+            return res.status(404).json({ message: 'Truck model not found.' });
+        }
+
+        const image = selectResult.rows[0].image;
+
+        // Delete the truck model
+        const deleteQuery = 'DELETE FROM truck_models WHERE id = $1 RETURNING *;';
+        const result = await db.query(deleteQuery, [id]);
+
+        if (image) {
+            const imagePath = path.join(UPLOADS_DIR, image);
+            if (fs.existsSync(imagePath)) {
+                fs.unlinkSync(imagePath);
+            }
+        }
+
+        res.status(200).json({
+            message: 'Truck model deleted successfully.',
+            truck: result.rows[0],
+        });
+    } catch (err) {
+        console.error('Error deleting truck model:', err.message);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+});
+
+module.exports = app;
