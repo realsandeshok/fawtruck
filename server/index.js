@@ -1,3 +1,4 @@
+const cors = require('cors');
 const express = require("express");
 // const multer = require('multer');
 const dotenv = require("dotenv");
@@ -33,6 +34,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors())  // if name of your backend is app
 
 // Routes
 app.use("/api/admin", loginRoutes); // Ready
