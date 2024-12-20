@@ -8,7 +8,7 @@ const db = require('../db/db')
 const app = express();
 
 // Directory to store uploaded images
-const UPLOADS_DIR = path.join(__dirname, 'uploads');
+const UPLOADS_DIR = path.join(__dirname, 'banner_uploads');
 
 // Ensure the uploads directory exists
 if (!fs.existsSync(UPLOADS_DIR)) {
@@ -41,14 +41,14 @@ const upload = multer({
 })
 
 // Upload Image Endpoint
-app.post('/upload-image', upload.single('image'), async (req, res) => {
+app.post('/upload-banner', upload.single('image'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ message: 'No file uploaded.' });
         }
 
         const fileName = req.file.filename;
-        const filePath = path.join('uploads', fileName);
+        const filePath = path.join('banner_uploads', fileName);
 
         // Generate a unique ID for the image
         // const actual_id = Date.now() // You can use UUID for more robust unique ID generation
@@ -72,5 +72,35 @@ app.post('/upload-image', upload.single('image'), async (req, res) => {
         res.status(500).json({ message: 'Internal server error.' });
     }
 });
+
+// GET ALL THE BANNERS
+app.get('/banner', async (req, res) => {
+    try {
+        // Fetch all banner data from the database
+        const query = `
+            SELECT file_name, file_path, uploaded_at
+            FROM images
+            ORDER BY uploaded_at DESC;
+        `;
+        const result = await db.query(query);
+
+        // Construct full image URLs
+        const baseURL = `${req.protocol}://${req.get('host')}`;
+        const banners = result.rows.map(banner => ({
+            ...banner,
+            image_url: `${baseURL}/${banner.file_path}`
+        }));
+
+        // Respond with the banner data
+        res.status(200).json({
+            message: 'Banners retrieved successfully.',
+            banners,
+        });
+    } catch (err) {
+        console.error('Error fetching banners:', err.message);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+});
+
 
 module.exports = app;

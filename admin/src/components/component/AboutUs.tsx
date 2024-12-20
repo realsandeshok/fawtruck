@@ -9,7 +9,7 @@ interface AboutUsContent {
 
 const AboutUs = () => {
   const [content, setContent] = useState<AboutUsContent>({
-    title: 'About Ourtitle: About Our Company',
+    title: 'About Our Company',
     description: 'We are a leading truck manufacturer committed to innovation and quality.',
     imageUrl: '/placeholder.svg',
   });

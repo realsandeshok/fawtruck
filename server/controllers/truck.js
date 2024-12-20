@@ -74,15 +74,22 @@ app.get('/trucks', async (req, res) => {
         const query = 'SELECT * FROM truck_models ORDER BY id;';
         const result = await db.query(query);
 
+        // Map image paths to accessible URLs
+        const trucks = result.rows.map(truck => ({
+            ...truck,
+            image_url: `${req.protocol}://${req.get('host')}/truck_uploads/${truck.image}`, // Construct the image URL
+        }));
+
         res.status(200).json({
             message: 'Truck models fetched successfully.',
-            trucks: result.rows,
+            trucks: trucks,
         });
     } catch (err) {
         console.error('Error fetching truck models:', err.message);
         res.status(500).json({ message: 'Internal server error.' });
     }
 });
+
 
 // API to fetch a single truck model by ID
 app.get('/trucks/:id', async (req, res) => {

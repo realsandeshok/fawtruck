@@ -1,6 +1,6 @@
 const cors = require('cors');
 const express = require("express");
-// const multer = require('multer');
+const path = require('path');
 const dotenv = require("dotenv");
 const registerRoutes = require("./controllers/register");
 const loginRoutes = require("./controllers/login");
@@ -16,33 +16,21 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Public route
-// app.get('/api/public', (req, res) => {
-//     res.status(200).json({ message: 'Welcome to the public route!' });
-// });
-
-// Protected route (requires login)
-// app.get('/api/admin/protected', verifyToken, (req, res) => {
-//     res.status(200).json({ message: `Hello, ${req.user.username}!` });
-// });
-
-// Admin-only route
-// app.get('/api/admin-panel/', verifyAdmin, (req, res) => {
-//     res.status(200).json({ message: 'Welcome, admin!' });
-// });
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors())  // if name of your backend is app
+app.use('/truck_uploads', express.static(path.join(__dirname, 'controllers/truck_uploads')));
+app.use('/banner_uploads', express.static(path.join(__dirname, 'controllers/banner_uploads')));
+
 
 // Routes
 app.use("/api/admin", loginRoutes); // Ready
-app.use("/api/admin", verifyAdmin, registerRoutes); // Add base paths // Ready
+app.use("/api/admin", verifyAdmin, registerRoutes); // Ready
 app.use("/api/admin", verifyAdmin, bannerRoutes); // Ready
 app.use("/api/admin", verifyAdmin, aboutRoutes); // Ready
 app.use("/api/admin", verifyAdmin, truckRoutes); // Ready
-// app.use(uaRoutes);
 
 // Test Database Connection
 (async () => {
