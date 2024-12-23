@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Edit, Save } from 'lucide-react';
 
 interface AboutUsContent {
+  id: number;
   title: string;
   description: string;
-  imageUrl: string;
+  // imageUrl: string;
 }
 
 const AboutUs = () => {
   const [content, setContent] = useState<AboutUsContent>({
-    title: 'About Our Company',
-    description: 'We are a leading truck manufacturer committed to innovation and quality.',
-    imageUrl: '/placeholder.svg',
+    id: 1, // Default ID; this should be dynamically set from the fetched data
+    title: 'Loading...',
+    description: 'Please wait while we fetch the content...',
+    // imageUrl: '/placeholder.svg',
   });
   const [isEditing, setIsEditing] = useState(false);
 
@@ -19,15 +21,71 @@ const AboutUs = () => {
     setIsEditing(true);
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // Here you would typically save the changes to a backend
-  };
+  const handleSave = async () => {
+    try {
+      // Send the updated content to the backend using PUT request
+      const response = await fetch(`http://localhost:3000/api/admin/about/${content.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: content.title,
+          description: content.description,
+        }),
+      });
+  
+      if (response.ok) {
+        const updatedContent = await response.json();
+        // console.log(updatedContent); // Log the response to check the structure
+  
+        // Check if updatedContent contains the expected 'about' object
+        if (updatedContent && updatedContent.about) {
+          setContent(updatedContent.about); // Set the updated content directly
+          setIsEditing(false); // Exit editing mode
+          alert('Content saved successfully!');
+        } else {
+          console.error('Unexpected response format:', updatedContent);
+          alert('Error saving content');
+        }
+      } else {
+        alert('Error saving content');
+      }
+    } catch (error) {
+      console.error('Error saving about data:', error);
+      alert('Error saving content');
+    }
+  }; 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setContent(prev => ({ ...prev, [name]: value }));
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/admin/about');
+        const data = await response.json();
+        
+        if (data && data.about && Array.isArray(data.about) && data.about.length > 0) {
+          const latestContent = data.about[0]; // Select the first item in the array
+          setContent({
+            id: latestContent.id, // Set the ID for the PUT request
+            title: latestContent.title,
+            description: latestContent.description,
+            // imageUrl: latestContent.imageUrl || '/placeholder.svg', /// Set a default image if not provided
+          });
+        } else {
+          console.log('No content available');
+        }
+      } catch (error) {
+        console.error('Error fetching about data:', error);
+      }
+    };
+
+    fetchData();
+  }, []); // Runs once on component mount
 
   return (
     <div className="p-6">
@@ -77,7 +135,7 @@ const AboutUs = () => {
                 rows={4}
               ></textarea>
             </div>
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <label htmlFor="imageUrl" className="block mb-1">Image URL</label>
               <input
                 type="text"
@@ -87,13 +145,13 @@ const AboutUs = () => {
                 onChange={handleChange}
                 className="w-full border rounded-md px-3 py-2"
               />
-            </div>
+            </div> */}
           </form>
         ) : (
           <div>
             <h2 className="text-xl font-bold mb-4">{content.title}</h2>
             <p className="mb-4">{content.description}</p>
-            <img src={content.imageUrl} alt="About Us" className="w-full h-64 object-cover rounded-md" />
+            {/* <img src={content.imageUrl} alt="About Us" className="w-full h-64 object-cover rounded-md" /> */}
           </div>
         )}
       </div>
@@ -102,4 +160,3 @@ const AboutUs = () => {
 };
 
 export default AboutUs;
-
