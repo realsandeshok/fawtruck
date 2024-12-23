@@ -78,7 +78,7 @@ app.get('/banner', async (req, res) => {
     try {
         // Fetch all banner data from the database
         const query = `
-            SELECT file_name, file_path, uploaded_at
+            SELECT id, file_name, file_path, uploaded_at
             FROM images
             ORDER BY uploaded_at DESC;
         `;
@@ -91,6 +91,7 @@ app.get('/banner', async (req, res) => {
             image_url: `${baseURL}/${banner.file_path}`
         }));
 
+        // console.log(banners)
         // Respond with the banner data
         res.status(200).json({
             message: 'Banners retrieved successfully.',
@@ -98,6 +99,40 @@ app.get('/banner', async (req, res) => {
         });
     } catch (err) {
         console.error('Error fetching banners:', err.message);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+});
+
+// DELETE a banner by ID
+app.delete('/banner/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Fetch the banner details to get the file path
+        const selectQuery = `SELECT file_path FROM images WHERE id = $1;`;
+        const selectResult = await db.query(selectQuery, [id]);
+
+        if (selectResult.rows.length === 0) {
+            return res.status(404).json({ message: 'Banner not found.' });
+        }
+
+        const { file_path: filePath } = selectResult.rows[0];
+        const fullPath = path.join(__dirname, filePath);
+
+        // Delete the file from the server
+        if (fs.existsSync(fullPath)) {
+            fs.unlinkSync(fullPath);
+        } else {
+            console.warn(`File not found: ${fullPath}`);
+        }
+
+        // Delete the banner record from the database
+        const deleteQuery = `DELETE FROM images WHERE id = $1;`;
+        await db.query(deleteQuery, [id]);
+
+        res.status(200).json({ message: 'Banner deleted successfully.' });
+    } catch (err) {
+        console.error('Error deleting banner:', err.message);
         res.status(500).json({ message: 'Internal server error.' });
     }
 });

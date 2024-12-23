@@ -1,20 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PlusCircle, Edit, Trash2 } from 'lucide-react';
 
 interface Banner {
   id: number;
-  title: string;
+  file_name: string;
   description: string;
-  imageUrl: string;
-  actionUrl: string;
+  image_url: string;
+  // actionUrl: string;
 }
 
 const Banner = () => {
-  const [banners, setBanners] = useState<Banner[]>([
-    { id: 1, title: 'Summer Sale', description: 'Get 20% off on all trucks', imageUrl: '/placeholder.svg', actionUrl: '/sale' },
-  ]);
+  const [banners, setBanners] = useState<Banner[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentBanner, setCurrentBanner] = useState<Banner | null>(null);
+
+  // Fetch banners from API when component mounts
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/admin/banner');
+        if (response.ok) {
+          const data = await response.json();
+          setBanners(data.banners); // Assuming the response contains a "banners" array
+        } else {
+          console.error('Failed to fetch banners');
+        }
+      } catch (error) {
+        console.error('Error fetching banners:', error);
+      }
+    };
+
+    fetchBanners();
+  }, []);
 
   const openModal = (banner: Banner | null = null) => {
     setCurrentBanner(banner);
@@ -23,18 +40,75 @@ const Banner = () => {
 
   const closeModal = () => {
     setCurrentBanner(null);
+    
     setIsModalOpen(false);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // Handle form submission for creating or updating a banner
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Handle form submission (create or update)
-    closeModal();
+
+    const bannerData = {
+      title: (e.target as any).title.value,
+      description: (e.target as any).description.value,
+      image_url: (e.target as any).image_url.value,
+      // actionUrl: (e.target as any).actionUrl.value,
+    };
+
+    try {
+      const url = currentBanner
+        ? `http://localhost:3000/api/admin/banner/${currentBanner.id}` // Update existing banner
+        : 'http://localhost:3000/api/admin/upload-banner'; // Create new banner
+
+      const method = currentBanner ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(bannerData),
+      });
+
+      if (response.ok) {
+        const updatedBanner = await response.json();
+        // Update the banners state with the new or updated banner
+        if (currentBanner) {
+          setBanners((prevBanners) =>
+            prevBanners.map((banner) =>
+              banner.id === updatedBanner.id ? updatedBanner : banner
+            )
+          );
+        } else {
+          setBanners((prevBanners) => [...prevBanners, updatedBanner]);
+        }
+        closeModal();
+      } else {
+        alert('Error saving banner');
+      }
+    } catch (error) {
+      console.error('Error saving banner:', error);
+      alert('Error saving banner');
+    }
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     if (confirm('Are you sure you want to delete this banner?')) {
-      setBanners(banners.filter(banner => banner.id !== id));
+      try {
+        const response = await fetch(`http://localhost:3000/api/admin/banner/${id}`, {
+          method: 'DELETE',
+        });
+        console.log(response)
+
+        if (response.ok) {
+          setBanners(banners.filter((banner) => banner.id !== id));
+        } else {
+          alert('Error deleting banner, ok');
+        }
+      } catch (error) {
+        console.error('Error deleting banner:', error);
+        alert('Error deleting banner');
+      }
     }
   };
 
@@ -55,19 +129,19 @@ const Banner = () => {
         <table className="min-w-full bg-white border border-gray-300">
           <thead>
             <tr>
-              <th className="px-6 py-3 border-b">Title</th>
-              <th className="px-6 py-3 border-b">Description</th>
-              <th className="px-6 py-3 border-b">Image</th>
-              <th className="px-6 py-3 border-b">Actions</th>
+              <th className="px-6 py-3 border-b text-start">Title</th>
+              {/* <th className="px-6 py-3 border-b">Description</th> */}
+              <th className="px-6 py-3 border-b text-start">Image</th>
+              <th className="px-6 py-3 border-b text-start">Actions</th>
             </tr>
           </thead>
           <tbody>
             {banners.map((banner) => (
               <tr key={banner.id}>
-                <td className="px-6 py-4 border-b">{banner.title}</td>
-                <td className="px-6 py-4 border-b">{banner.description}</td>
+                <td className="px-6 py-4 border-b">{banner.file_name}</td>
+                {/* <td className="px-6 py-4 border-b">{banner.description}</td> */}
                 <td className="px-6 py-4 border-b">
-                  <img src={banner.imageUrl} alt={banner.title} className="w-20 h-20 object-cover" />
+                  <img src={banner.image_url} alt={banner.file_name} className="w-20 h-20 object-cover" />
                 </td>
                 <td className="px-6 py-4 border-b">
                   <button onClick={() => openModal(banner)} className="text-blue-500 hover:text-blue-600 mr-2">
@@ -94,11 +168,11 @@ const Banner = () => {
                   type="text"
                   id="title"
                   className="w-full border rounded-md px-3 py-2"
-                  defaultValue={currentBanner?.title}
+                  defaultValue={currentBanner?.file_name}
                   required
                 />
               </div>
-              <div className="mb-4">
+              {/* <div className="mb-4">
                 <label htmlFor="description" className="block mb-1">Description</label>
                 <textarea
                   id="description"
@@ -106,18 +180,18 @@ const Banner = () => {
                   defaultValue={currentBanner?.description}
                   required
                 ></textarea>
-              </div>
+              </div> */}
               <div className="mb-4">
-                <label htmlFor="imageUrl" className="block mb-1">Image URL</label>
+                <label htmlFor="image_url" className="block mb-1">Image URL</label>
                 <input
                   type="text"
-                  id="imageUrl"
+                  id="image_url"
                   className="w-full border rounded-md px-3 py-2"
-                  defaultValue={currentBanner?.imageUrl}
+                  defaultValue={currentBanner?.image_url}
                   required
                 />
               </div>
-              <div className="mb-4">
+              {/* <div className="mb-4">
                 <label htmlFor="actionUrl" className="block mb-1">Action URL</label>
                 <input
                   type="text"
@@ -126,7 +200,7 @@ const Banner = () => {
                   defaultValue={currentBanner?.actionUrl}
                   required
                 />
-              </div>
+              </div> */}
               <div className="flex justify-end">
                 <button type="button" onClick={closeModal} className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md mr-2">
                   Cancel
@@ -144,4 +218,3 @@ const Banner = () => {
 };
 
 export default Banner;
-
