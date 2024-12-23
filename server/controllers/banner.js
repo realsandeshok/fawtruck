@@ -138,4 +138,59 @@ app.delete('/banner/:id', async (req, res) => {
 });
 
 
+// Update a banner by ID
+app.put('/banner/:id', upload.single('image'), async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Fetch the existing banner details
+        const selectQuery = `SELECT file_path FROM images WHERE id = $1;`;
+        const selectResult = await db.query(selectQuery, [id]);
+
+        if (selectResult.rows.length === 0) {
+            return res.status(404).json({ message: 'Banner not found.' });
+        }
+
+        const { file_path: oldFilePath } = selectResult.rows[0];
+        const oldFullPath = path.join(__dirname, oldFilePath);
+
+        // If a new image is provided, update the file
+        let newFileName = null;
+        let newFilePath = null;
+
+        if (req.file) {
+            newFileName = req.file.filename;
+            newFilePath = path.join('banner_uploads', newFileName);
+
+            // Delete the old file from the server
+            if (fs.existsSync(oldFullPath)) {
+                fs.unlinkSync(oldFullPath);
+            } else {
+                console.warn(`Old file not found: ${oldFullPath}`);
+            }
+        }
+
+        // Update the database record
+        const updateQuery = `
+            UPDATE images
+            SET file_name = COALESCE($1, file_name),
+                file_path = COALESCE($2, file_path),
+                uploaded_at = COALESCE($3, uploaded_at)
+            WHERE id = $4
+            RETURNING *;
+        `;
+        const uploadedAt = req.file ? new Date() : null; // Only update uploaded_at if a new file is uploaded
+        const updateResult = await db.query(updateQuery, [newFileName, newFilePath, uploadedAt, id]);
+
+        res.status(200).json({
+            message: 'Banner updated successfully.',
+            banner: updateResult.rows[0],
+        });
+    } catch (err) {
+        console.error('Error updating banner:', err.message);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+});
+
+
 module.exports = app;

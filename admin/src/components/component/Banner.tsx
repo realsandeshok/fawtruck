@@ -13,6 +13,7 @@ const Banner = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentBanner, setCurrentBanner] = useState<Banner | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // Fetch banners from API when component mounts
   useEffect(() => {
@@ -35,52 +36,50 @@ const Banner = () => {
 
   const openModal = (banner: Banner | null = null) => {
     setCurrentBanner(banner);
+    setSelectedFile(null); // Reset file input when opening the modal
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setCurrentBanner(null);
-    
+    setSelectedFile(null);
     setIsModalOpen(false);
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setSelectedFile(file);
+  };
+  
   // Handle form submission for creating or updating a banner
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    const bannerData = {
-      title: (e.target as any).title.value,
-      description: (e.target as any).description.value,
-      image_url: (e.target as any).image_url.value,
-      // actionUrl: (e.target as any).actionUrl.value,
-    };
-
+  
+    const formData = new FormData();
+    // formData.append('file_name', (e.target as any).title.value); // Assuming "title" field corresponds to "file_name"
+    if (selectedFile) {
+      formData.append('image', selectedFile);
+    }
+  
     try {
       const url = currentBanner
         ? `http://localhost:3000/api/admin/banner/${currentBanner.id}` // Update existing banner
         : 'http://localhost:3000/api/admin/upload-banner'; // Create new banner
-
+  
       const method = currentBanner ? 'PUT' : 'POST';
-
+  
       const response = await fetch(url, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(bannerData),
+        body: formData,
       });
-
+  
       if (response.ok) {
-        const updatedBanner = await response.json();
-        // Update the banners state with the new or updated banner
-        if (currentBanner) {
-          setBanners((prevBanners) =>
-            prevBanners.map((banner) =>
-              banner.id === updatedBanner.id ? updatedBanner : banner
-            )
-          );
-        } else {
-          setBanners((prevBanners) => [...prevBanners, updatedBanner]);
+        // const updatedBanner = await response.json();
+        // Refetch banners to ensure state is updated
+        const bannersResponse = await fetch('http://localhost:3000/api/admin/banner');
+        if (bannersResponse.ok) {
+          const bannersData = await bannersResponse.json();
+          setBanners(bannersData.banners); // Update state with latest banners
         }
         closeModal();
       } else {
@@ -91,6 +90,7 @@ const Banner = () => {
       alert('Error saving banner');
     }
   };
+  
 
   const handleDelete = async (id: number) => {
     if (confirm('Are you sure you want to delete this banner?')) {
@@ -140,8 +140,8 @@ const Banner = () => {
               <tr key={banner.id}>
                 <td className="px-6 py-4 border-b">{banner.file_name}</td>
                 {/* <td className="px-6 py-4 border-b">{banner.description}</td> */}
-                <td className="px-6 py-4 border-b">
-                  <img src={banner.image_url} alt={banner.file_name} className="w-20 h-20 object-cover" />
+                <td className="px-8 py-4 border-b">
+                  <img src={banner.image_url} alt={banner.file_name} className="w-full h-20 object-cover" />
                 </td>
                 <td className="px-6 py-4 border-b">
                   <button onClick={() => openModal(banner)} className="text-blue-500 hover:text-blue-600 mr-2">
@@ -162,7 +162,7 @@ const Banner = () => {
           <div className="bg-white p-6 rounded-lg w-96">
             <h2 className="text-xl font-bold mb-4">{currentBanner ? 'Edit Banner' : 'Add Banner'}</h2>
             <form onSubmit={handleSubmit}>
-              <div className="mb-4">
+              {/* <div className="mb-4">
                 <label htmlFor="title" className="block mb-1">Title</label>
                 <input
                   type="text"
@@ -171,7 +171,7 @@ const Banner = () => {
                   defaultValue={currentBanner?.file_name}
                   required
                 />
-              </div>
+              </div> */}
               {/* <div className="mb-4">
                 <label htmlFor="description" className="block mb-1">Description</label>
                 <textarea
@@ -181,14 +181,15 @@ const Banner = () => {
                   required
                 ></textarea>
               </div> */}
-              <div className="mb-4">
-                <label htmlFor="image_url" className="block mb-1">Image URL</label>
+               <div className="mb-4">
+                <label htmlFor="image" className="block mb-1">Image</label>
                 <input
-                  type="text"
-                  id="image_url"
+                  type="file"
+                  id="image"
                   className="w-full border rounded-md px-3 py-2"
-                  defaultValue={currentBanner?.image_url}
-                  required
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  required={!currentBanner} // Only required for new banners
                 />
               </div>
               {/* <div className="mb-4">

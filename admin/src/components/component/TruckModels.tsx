@@ -1,48 +1,116 @@
-import React, { useState } from 'react';
-import { PlusCircle, Edit, Trash2, Search } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { PlusCircle, Edit, Trash2 } from 'lucide-react';
 
 interface TruckModel {
   id: number;
-  name: string;
-  description: string;
-  imageUrl: string;
-  specifications: string;
+  truck_name: string;
+  image_url: string;
 }
 
 const TruckModels = () => {
-  const [truckModels, setTruckModels] = useState<TruckModel[]>([
-    { id: 1, name: 'Heavy Duty Truck', description: 'Powerful truck for heavy loads', imageUrl: '/placeholder.svg', specifications: 'Engine: 500HP, Payload: 30 tons' },
-  ]);
+  const [truckModels, setTruckModels] = useState<TruckModel[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentModel, setCurrentModel] = useState<TruckModel | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null); // File input state
+
+  useEffect(() => {
+    // Fetch truck data from API on component mount
+    const fetchTruckModels = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/admin/trucks');
+        const data = await response.json();
+        
+        if (response.ok && data.trucks) {
+          setTruckModels(data.trucks);
+        } else {
+          console.error('Failed to fetch truck models');
+        }
+      } catch (error) {
+        console.error('Error fetching truck models:', error);
+      }
+    };
+
+    fetchTruckModels();
+  }, []); // Empty dependency array to run only on mount
 
   const openModal = (model: TruckModel | null = null) => {
     setCurrentModel(model);
     setIsModalOpen(true);
+    setSelectedFile(null); // Clear selected file when opening modal
   };
 
   const closeModal = () => {
     setCurrentModel(null);
     setIsModalOpen(false);
+    setSelectedFile(null); // Clear selected file when closing modal
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Handle form submission (create or update)
-    closeModal();
-  };
-
-  const handleDelete = (id: number) => {
-    if (confirm('Are you sure you want to delete this truck model?')) {
-      setTruckModels(truckModels.filter(model => model.id !== id));
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setSelectedFile(e.target.files[0]); // Set selected file
     }
   };
 
-  const filteredModels = truckModels.filter(model =>
-    model.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    model.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+  
+    const formData = new FormData();
+    formData.append('truck_name', ((e.target as HTMLFormElement).elements.namedItem('name') as HTMLInputElement)?.value || '');
+    if (selectedFile) {
+      formData.append('image', selectedFile); // Append the image file
+    }
+  
+    try {
+      const url = currentModel
+        ? `http://localhost:3000/api/admin/trucks/${currentModel.id}` // Update existing model
+        : 'http://localhost:3000/api/admin/trucks'; // Create new model
+  
+      const method = currentModel ? 'PUT' : 'POST';
+  
+      const response = await fetch(url, {
+        method,
+        body: formData,
+      });
+  
+      if (response.ok) {
+        // const updatedBanner = await response.json();
+        // Refetch banners to ensure state is updated
+        const data = await fetch('http://localhost:3000/api/admin/trucks');
+        if (data.ok) {
+          const trucksData = await data.json();
+          setTruckModels(trucksData.trucks); // Update state with latest banners
+        }
+        closeModal();
+      } else {
+        alert('Error saving truck model');
+      }
+    } catch (error) {
+      console.error('Error saving truck model:', error);
+      alert('Error saving truck model');
+    }
+  };
+  
+
+  const handleDelete = async (id: number) => {
+    if (confirm('Are you sure you want to delete this truck model?')) {
+      try {
+        const response = await fetch(`http://localhost:3000/api/admin/trucks/${id}`, {
+          method: 'DELETE',
+        });
+  
+        if (response.ok) {
+          // Remove the deleted truck model from state
+          setTruckModels(prevTruckModels => prevTruckModels.filter((model) => model.id !== id));
+        } else {
+          alert('Error deleting truck model');
+        }
+      } catch (error) {
+        console.error('Error deleting truck model:', error);
+        alert('Error deleting truck model');
+      }
+    }
+  };
+  
 
   return (
     <div className="p-6">
@@ -57,39 +125,22 @@ const TruckModels = () => {
         </button>
       </div>
 
-      <div className="mb-4">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search truck models..."
-            className="w-full border rounded-md pl-10 pr-4 py-2"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
-        </div>
-      </div>
-
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300">
           <thead>
             <tr>
-              <th className="px-6 py-3 border-b">Name</th>
-              <th className="px-6 py-3 border-b">Description</th>
-              <th className="px-6 py-3 border-b">Image</th>
-              <th className="px-6 py-3 border-b">Specifications</th>
-              <th className="px-6 py-3 border-b">Actions</th>
+              <th className="px-6 py-3 border-b text-start">Name</th>
+              <th className="px-6 py-3 border-b text-start">Image</th>
+              <th className="px-6 py-3 border-b text-start">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredModels.map((model) => (
+            {truckModels.map((model) => (
               <tr key={model.id}>
-                <td className="px-6 py-4 border-b">{model.name}</td>
-                <td className="px-6 py-4 border-b">{model.description}</td>
+                <td className="px-6 py-4 border-b">{model.truck_name}</td>
                 <td className="px-6 py-4 border-b">
-                  <img src={model.imageUrl} alt={model.name} className="w-20 h-20 object-cover" />
+                  <img src={model.image_url} alt={model.truck_name} className="w-20 h-20 object-cover" />
                 </td>
-                <td className="px-6 py-4 border-b">{model.specifications}</td>
                 <td className="px-6 py-4 border-b">
                   <button onClick={() => openModal(model)} className="text-blue-500 hover:text-blue-600 mr-2">
                     <Edit size={20} />
@@ -114,38 +165,21 @@ const TruckModels = () => {
                 <input
                   type="text"
                   id="name"
+                  name="name"
                   className="w-full border rounded-md px-3 py-2"
-                  defaultValue={currentModel?.name}
+                  defaultValue={currentModel?.truck_name || ''}
                   required
                 />
               </div>
               <div className="mb-4">
-                <label htmlFor="description" className="block mb-1">Description</label>
-                <textarea
-                  id="description"
-                  className="w-full border rounded-md px-3 py-2"
-                  defaultValue={currentModel?.description}
-                  required
-                ></textarea>
-              </div>
-              <div className="mb-4">
-                <label htmlFor="imageUrl" className="block mb-1">Image URL</label>
+                <label htmlFor="imageUrl" className="block mb-1">Image</label>
                 <input
-                  type="text"
+                  type="file"
                   id="imageUrl"
+                  name="image"
                   className="w-full border rounded-md px-3 py-2"
-                  defaultValue={currentModel?.imageUrl}
-                  required
+                  onChange={handleFileChange}
                 />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="specifications" className="block mb-1">Specifications</label>
-                <textarea
-                  id="specifications"
-                  className="w-full border rounded-md px-3 py-2"
-                  defaultValue={currentModel?.specifications}
-                  required
-                ></textarea>
               </div>
               <div className="flex justify-end">
                 <button type="button" onClick={closeModal} className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md mr-2">
@@ -164,4 +198,3 @@ const TruckModels = () => {
 };
 
 export default TruckModels;
-
