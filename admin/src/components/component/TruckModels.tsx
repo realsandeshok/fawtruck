@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PlusCircle, Edit, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface TruckModel {
   id: number;
@@ -16,10 +17,20 @@ const TruckModels = () => {
   useEffect(() => {
     // Fetch truck data from API on component mount
     const fetchTruckModels = async () => {
+      const token = localStorage.getItem('token'); // Retrieve token from local storage
+      if (!token) {
+        console.error('Token not found. User might need to log in.');
+        toast.error('Session expired. Please log in again.');
+        return;
+      }
       try {
-        const response = await fetch('http://localhost:3000/api/admin/trucks');
+        const response = await fetch('http://localhost:3000/api/admin/trucks', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const data = await response.json();
-        
+
         if (response.ok && data.trucks) {
           setTruckModels(data.trucks);
         } else {
@@ -53,29 +64,42 @@ const TruckModels = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
+    const token = localStorage.getItem('token'); // Get the token from localStorage
+    if (!token) {
+      toast.error('Session expired. Please log in again.');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('truck_name', ((e.target as HTMLFormElement).elements.namedItem('name') as HTMLInputElement)?.value || '');
     if (selectedFile) {
       formData.append('image', selectedFile); // Append the image file
     }
-  
+
     try {
       const url = currentModel
         ? `http://localhost:3000/api/admin/trucks/${currentModel.id}` // Update existing model
         : 'http://localhost:3000/api/admin/trucks'; // Create new model
-  
+
       const method = currentModel ? 'PUT' : 'POST';
-  
+
       const response = await fetch(url, {
         method,
+        headers: {
+          Authorization: `Bearer ${token}`, // Include the token
+        },
         body: formData,
       });
-  
+
       if (response.ok) {
         // const updatedBanner = await response.json();
         // Refetch banners to ensure state is updated
-        const data = await fetch('http://localhost:3000/api/admin/trucks');
+        const data = await fetch('http://localhost:3000/api/admin/trucks', {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token
+          },
+        });
         if (data.ok) {
           const trucksData = await data.json();
           setTruckModels(trucksData.trucks); // Update state with latest banners
@@ -89,28 +113,42 @@ const TruckModels = () => {
       alert('Error saving truck model');
     }
   };
-  
 
-  const handleDelete = async (id: number) => {
-    if (confirm('Are you sure you want to delete this truck model?')) {
-      try {
-        const response = await fetch(`http://localhost:3000/api/admin/trucks/${id}`, {
-          method: 'DELETE',
-        });
-  
-        if (response.ok) {
-          // Remove the deleted truck model from state
-          setTruckModels(prevTruckModels => prevTruckModels.filter((model) => model.id !== id));
-        } else {
-          alert('Error deleting truck model');
-        }
-      } catch (error) {
-        console.error('Error deleting truck model:', error);
+
+ const handleDelete = async (id: number) => {
+  if (confirm('Are you sure you want to delete this truck model?')) {
+    const token = localStorage.getItem('token'); // Get the token from localStorage
+    if (!token) {
+      toast.error('Session expired. Please log in again.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/admin/trucks/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`, // Include the token in headers
+        },
+      });
+
+      if (response.ok) {
+        // Remove the deleted truck model from state
+        setTruckModels((prevTruckModels) =>
+          prevTruckModels.filter((model) => model.id !== id)
+        );
+      } else {
+        const error = await response.json();
+        console.error('Error response:', error);
         alert('Error deleting truck model');
       }
+    } catch (error) {
+      console.error('Error deleting truck model:', error);
+      alert('Error deleting truck model');
     }
-  };
-  
+  }
+};
+
+
 
   return (
     <div className="p-6">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Edit, Save } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface AboutUsContent {
   id: number;
@@ -22,12 +23,19 @@ const AboutUs = () => {
   };
 
   const handleSave = async () => {
+    const token = localStorage.getItem('token'); // Get the token from localStorage
+    if (!token) {
+      toast.error('Session expired. Please log in again.');
+      return;
+    }
+  
     try {
       // Send the updated content to the backend using PUT request
       const response = await fetch(`http://localhost:3000/api/admin/about/${content.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Include token in headers
         },
         body: JSON.stringify({
           title: content.title,
@@ -37,7 +45,6 @@ const AboutUs = () => {
   
       if (response.ok) {
         const updatedContent = await response.json();
-        // console.log(updatedContent); // Log the response to check the structure
   
         // Check if updatedContent contains the expected 'about' object
         if (updatedContent && updatedContent.about) {
@@ -49,14 +56,17 @@ const AboutUs = () => {
           alert('Error saving content');
         }
       } else {
-        alert('Error saving content');
+        // Parse and log the error response
+        const errorData = await response.json();
+        console.error('Error response:', errorData);
+        alert(`Error saving content: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error saving about data:', error);
       alert('Error saving content');
     }
-  }; 
-
+  };
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setContent(prev => ({ ...prev, [name]: value }));
@@ -64,10 +74,20 @@ const AboutUs = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      const token = localStorage.getItem('token'); // Retrieve token from local storage
+      if (!token) {
+        console.error('Token not found. User might need to log in.');
+        toast.error('Session expired. Please log in again.');
+        return;
+      }
       try {
-        const response = await fetch('http://localhost:3000/api/admin/about');
+        const response = await fetch('http://localhost:3000/api/admin/about', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const data = await response.json();
-        
+
         if (data && data.about && Array.isArray(data.about) && data.about.length > 0) {
           const latestContent = data.about[0]; // Select the first item in the array
           setContent({

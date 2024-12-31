@@ -11,7 +11,7 @@ function About() {
   useEffect(() => {
     const fetchAboutData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/admin/about");
+        const response = await fetch("http://localhost:3000/api/about");
         const data = await response.json();
         if (data.about && data.about.length > 0) {
           setAboutData(data.about[0]); // Assuming you want the first item
