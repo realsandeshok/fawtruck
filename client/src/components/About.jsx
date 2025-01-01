@@ -17,7 +17,7 @@ function About() {
   useEffect(() => {
     const fetchAboutData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/admin/about");
+        const response = await fetch("http://localhost:3000/api/about");
         const data = await response.json();
         if (data.about && data.about.length > 0) {
           setAboutData(data.about[0]); // Assuming you want the first item
@@ -136,12 +136,12 @@ function About() {
                       معلومات عنا
                     </h2>
                     <p className="text-gray-200 mb-2 pb-4">
-                      {aboutData ? aboutData.title : "Loading..."}
+                      {aboutData ? aboutData.title_ar : "Loading..."}
                     </p>
                     <hr className="w-[190px] h-[4px] bg-gray-300 border-r-2 ml-auto" />
                     <p className="text-gray-200 my-5">
                       {aboutData
-                        ? aboutData.description
+                        ? aboutData.description_ar
                         : "Fetching description..."}
                     </p>
                     <button className="px-4 py-2 mt-4 bg-white text-blue-500 rounded-lg hover:bg-blue-700 hover:text-white transition duration-300 ml-auto block">
