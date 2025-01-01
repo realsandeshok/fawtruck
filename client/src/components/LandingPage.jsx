@@ -79,7 +79,7 @@ export default function Home() {
   useEffect(() => {
     const fetchTruckModels = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/admin/trucks");
+        const response = await fetch("http://localhost:3000/api/trucks");
         const data = await response.json();
         if (data.trucks) {
           console.log(data.trucks);
@@ -100,6 +100,7 @@ export default function Home() {
         id="Home"
         className="relative  from-blue-900 to-blue-700 text-white "
       >
+        <div>Hii</div>
         <Navbar />
         <Carousel className="" />
         {/* Overlay for better text visibility */}
