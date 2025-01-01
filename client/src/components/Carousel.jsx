@@ -12,7 +12,7 @@ export function Carousel() {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/banner');
+        const response = await fetch('http://localhost:3000/api/admin/banner');
         const data = await response.json();
         setBanners(data.banners); // Set banners in state
       } catch (error) {

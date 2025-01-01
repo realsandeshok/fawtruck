@@ -33,7 +33,7 @@ export function LoginForm({
       }
 
       const data = await response.json()
-
+      console.log(data)
       // Store token in localStorage
       localStorage.setItem("token", data.token)
 
