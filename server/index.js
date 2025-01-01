@@ -26,11 +26,18 @@ app.use('/banner_uploads', express.static(path.join(__dirname, 'controllers/bann
 
 
 // Routes
-app.use("/api/admin", loginRoutes); // Ready
+app.use("/api/admin",  loginRoutes); // Ready
 app.use("/api/admin",  registerRoutes); // Ready
-app.use("/api/admin",  bannerRoutes); // Ready
-app.use("/api/admin",  aboutRoutes); // Ready
-app.use("/api/admin",  truckRoutes); // Ready
+
+//adminn protected routes
+app.use("/api/admin",verifyAdmin,  bannerRoutes); // Ready
+app.use("/api/admin",verifyAdmin,  aboutRoutes); // Ready
+app.use("/api/admin",verifyAdmin,  truckRoutes); // Ready
+
+//web public routes
+app.use("/api",  bannerRoutes); // Ready
+app.use("/api",  aboutRoutes); // Ready
+app.use("/api",  truckRoutes); // Ready
 
 // Test Database Connection
 (async () => {

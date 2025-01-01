@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PlusCircle, Edit, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface Banner {
   id: number;
@@ -18,18 +19,32 @@ const Banner = () => {
   // Fetch banners from API when component mounts
   useEffect(() => {
     const fetchBanners = async () => {
+      const token = localStorage.getItem('token'); // Retrieve token from local storage
+      if (!token) {
+        console.error('Token not found. User might need to log in.');
+        toast.error('Session expired. Please log in again.');
+        return;
+      }
+    
       try {
-        const response = await fetch('http://localhost:3000/api/admin/banner');
+        const response = await fetch('http://localhost:3000/api/admin/banner', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+    
         if (response.ok) {
           const data = await response.json();
           setBanners(data.banners); // Assuming the response contains a "banners" array
         } else {
-          console.error('Failed to fetch banners');
+          const errorText = await response.text();
+          console.error(`Error fetching banners: ${response.status}`, errorText);
         }
       } catch (error) {
         console.error('Error fetching banners:', error);
       }
     };
+    
 
     fetchBanners();
   }, []);
@@ -50,67 +65,90 @@ const Banner = () => {
     const file = e.target.files?.[0] || null;
     setSelectedFile(file);
   };
-  
-  // Handle form submission for creating or updating a banner
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-  
-    const formData = new FormData();
-    // formData.append('file_name', (e.target as any).title.value); // Assuming "title" field corresponds to "file_name"
-    if (selectedFile) {
-      formData.append('image', selectedFile);
-    }
-  
-    try {
-      const url = currentBanner
-        ? `http://localhost:3000/api/admin/banner/${currentBanner.id}` // Update existing banner
-        : 'http://localhost:3000/api/admin/upload-banner'; // Create new banner
-  
-      const method = currentBanner ? 'PUT' : 'POST';
-  
-      const response = await fetch(url, {
-        method,
-        body: formData,
+
+// Handle form submission for creating or updating a banner
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+
+  const token = localStorage.getItem('token'); // Get the token from localStorage
+  if (!token) {
+    toast.error('Session expired. Please log in again.');
+    return;
+  }
+
+  const formData = new FormData();
+  if (selectedFile) {
+    formData.append('image', selectedFile);
+  }
+
+  try {
+    const url = currentBanner
+      ? `http://localhost:3000/api/admin/banner/${currentBanner.id}` // Update existing banner
+      : 'http://localhost:3000/api/admin/upload-banner'; // Create new banner
+
+    const method = currentBanner ? 'PUT' : 'POST';
+
+    const response = await fetch(url, {
+      method,
+      headers: {
+        Authorization: `Bearer ${token}`, // Include the token in headers
+      },
+      body: formData,
+    });
+
+    if (response.ok) {
+      const bannersResponse = await fetch('http://localhost:3000/api/admin/banner', {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include the token in headers
+        },
       });
-  
-      if (response.ok) {
-        // const updatedBanner = await response.json();
-        // Refetch banners to ensure state is updated
-        const bannersResponse = await fetch('http://localhost:3000/api/admin/banner');
-        if (bannersResponse.ok) {
-          const bannersData = await bannersResponse.json();
-          setBanners(bannersData.banners); // Update state with latest banners
-        }
-        closeModal();
-      } else {
-        alert('Error saving banner');
+      if (bannersResponse.ok) {
+        const bannersData = await bannersResponse.json();
+        setBanners(bannersData.banners); // Update state with latest banners
       }
-    } catch (error) {
-      console.error('Error saving banner:', error);
+      closeModal();
+    } else {
+      const error = await response.json();
+      console.error('Error response:', error);
       alert('Error saving banner');
     }
-  };
-  
+  } catch (error) {
+    console.error('Error saving banner:', error);
+    alert('Error saving banner');
+  }
+};
 
-  const handleDelete = async (id: number) => {
-    if (confirm('Are you sure you want to delete this banner?')) {
-      try {
-        const response = await fetch(`http://localhost:3000/api/admin/banner/${id}`, {
-          method: 'DELETE',
-        });
-        console.log(response)
+// Handle banner deletion
+const handleDelete = async (id: number) => {
+  if (confirm('Are you sure you want to delete this banner?')) {
+    const token = localStorage.getItem('token'); // Get the token from localStorage
+    if (!token) {
+      toast.error('Session expired. Please log in again.');
+      return;
+    }
 
-        if (response.ok) {
-          setBanners(banners.filter((banner) => banner.id !== id));
-        } else {
-          alert('Error deleting banner, ok');
-        }
-      } catch (error) {
-        console.error('Error deleting banner:', error);
+    try {
+      const response = await fetch(`http://localhost:3000/api/admin/banner/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`, // Include the token in headers
+        },
+      });
+
+      if (response.ok) {
+        setBanners(banners.filter((banner) => banner.id !== id));
+      } else {
+        const error = await response.json();
+        console.error('Error response:', error);
         alert('Error deleting banner');
       }
+    } catch (error) {
+      console.error('Error deleting banner:', error);
+      alert('Error deleting banner');
     }
-  };
+  }
+};
+
 
   return (
     <div className="p-6">
@@ -181,7 +219,7 @@ const Banner = () => {
                   required
                 ></textarea>
               </div> */}
-               <div className="mb-4">
+              <div className="mb-4">
                 <label htmlFor="image" className="block mb-1">Image</label>
                 <input
                   type="file"
