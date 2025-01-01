@@ -1,11 +1,9 @@
-import About from "./compo/about";
-import Home from "./compo/page";
-
+import Home from "./components/LandingPage";
 
 function App() {
   return (
     <div>
-      <Home/>
+      <Home />
     </div>
   );
 }
