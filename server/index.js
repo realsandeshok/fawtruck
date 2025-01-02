@@ -7,6 +7,7 @@ const loginRoutes = require("./controllers/login");
 const bannerRoutes = require("./controllers/banner");
 const truckRoutes = require("./controllers/truck");
 const aboutRoutes = require("./controllers/about");
+const enquiryRoutes = require("./controllers/enquires")
 // const uaRoutes= require('./UARoutes');
 const db = require("./db/db");
 const { verifyAdmin } = require("./middleware/authMiddleware"); // Updated import
@@ -33,11 +34,13 @@ app.use("/api/admin",  registerRoutes); // Ready
 app.use("/api/admin",verifyAdmin,  bannerRoutes); // Ready
 app.use("/api/admin",verifyAdmin,  aboutRoutes); // Ready
 app.use("/api/admin",verifyAdmin,  truckRoutes); // Ready
+app.use("/api/admin",verifyAdmin,  enquiryRoutes); // Ready
 
 //web public routes
 app.use("/api",  bannerRoutes); // Ready
 app.use("/api",  aboutRoutes); // Ready
 app.use("/api",  truckRoutes); // Ready
+app.use("/api",  enquiryRoutes); // Ready
 
 // Test Database Connection
 (async () => {
