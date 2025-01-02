@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Facebook, Instagram, Youtube } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 
-export default function Contact({language}) {
+export default function Contact({ language }) {
   const { ref: leftRef, inView } = useInView({
     triggerOnce: false,
   });
@@ -12,11 +12,52 @@ export default function Contact({language}) {
     triggerOnce: false,
   });
 
-  // const [language, setLanguage] = useState("en"); // Default to English
-  // useEffect(() => {
-  //   const currentPath = window.location.pathname; // Example: "/ar" for Arabic
-  //   setLanguage(currentPath.includes("/ar") ? "ar" : "en");
-  // }, []);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [responseMessage, setResponseMessage] = useState("");
+
+  const [formData, setFormData] = useState({
+    name: "",
+    country: "",
+    contact: "",
+    message: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setResponseMessage("");
+
+    try {
+      const response = await fetch("http://localhost:3000/api/enquiries", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setResponseMessage("Your message has been sent successfully!");
+        setFormData({
+          name: "",
+          country: "",
+          contact: "",
+          message: "",
+        });
+      } else {
+        setResponseMessage("Failed to send your message. Please try again.");
+      }
+    } catch (error) {
+      setResponseMessage("An error occurred. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -41,26 +82,40 @@ export default function Contact({language}) {
                 Our contact experts will help you with the choice of transport
                 and advice on issues of interest.
               </p>
-              <form className="space-y-4">
+              <form className="space-y-4" onSubmit={handleSubmit}>
                 <input
                   type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   placeholder="Al Shamel Commercial Vehicles"
                   className="w-full border-b border-gray-300 focus:border-blue-500 focus:outline-none px-4 py-2"
                 />
-                <select className="w-full border-b border-gray-300 focus:border-blue-500 focus:outline-none px-4 py-2">
+                <select
+                  name="country"
+                  value={formData.country}
+                  onChange={handleChange}
+                  className="w-full border-b border-gray-300 focus:border-blue-500 focus:outline-none px-4 py-2"
+                >
                   <option value="saudi-arabia">Saudi Arabia</option>
                   <option value="uae">UAE</option>
                   <option value="qatar">Qatar</option>
                 </select>
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">🇸🇦</span>
+                  {/* <span className="text-xl">🇸🇦</span> */}
                   <input
+                    name="contact"
+                    value={formData.contact}
+                    onChange={handleChange}
                     type="tel"
                     placeholder="+966 55 280 3657"
                     className="w-full border-b border-gray-300 focus:border-blue-500 focus:outline-none px-4 py-2"
                   />
                 </div>
                 <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
                   placeholder="Message"
                   className="w-full border-b border-gray-300 focus:border-blue-500 focus:outline-none px-4 py-2 h-24"
                 ></textarea>
@@ -205,7 +260,9 @@ export default function Contact({language}) {
                   </svg>
                 </div>
                 <div className="flex items-center gap-3 justify-end">
-                  <span>313, ضاحية الملك فهد, الدمام 32314, المملكة العربية السعودية</span>
+                  <span>
+                    313, ضاحية الملك فهد, الدمام 32314, المملكة العربية السعودية
+                  </span>
                   <svg
                     className="w-5 h-5"
                     fill="currentColor"
@@ -241,13 +298,21 @@ export default function Contact({language}) {
                 سيساعدك خبراؤنا في اختيار وسائل النقل وتقديم النصائح حول القضايا
                 ذات الاهتمام.
               </p>
-              <form className="space-y-4">
+              <form className="space-y-4" onSubmit={handleSubmit}>
                 <input
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   type="text"
                   placeholder="الشامل للمركبات التجارية"
                   className="w-full text-right border-b border-gray-300 focus:border-blue-500 focus:outline-none px-4 py-2"
                 />
-                <select className="w-full text-right border-b border-gray-300 focus:border-blue-500 focus:outline-none px-4 py-2">
+                <select
+                  name="country"
+                  value={formData.country}
+                  onChange={handleChange}
+                  className="w-full text-right border-b border-gray-300 focus:border-blue-500 focus:outline-none px-4 py-2"
+                >
                   <option value="saudi-arabia">العربية السعودية</option>
                   <option value="uae">الإمارات العربية المتحدة</option>
                   <option value="qatar">قطر</option>
@@ -255,12 +320,18 @@ export default function Contact({language}) {
                 <div className="flex items-center gap-2">
                   {/* <span className="text-xl text-right">🇸🇦</span> */}
                   <input
+                    name="contact"
+                    value={formData.contact}
+                    onChange={handleChange}
                     type="tel"
                     placeholder="+966 55 280 3657"
                     className="w-full text-right border-b border-gray-300 focus:border-blue-500 focus:outline-none px-4 py-2"
                   />
                 </div>
                 <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
                   placeholder="رسالة"
                   className="w-full text-right border-b border-gray-300 focus:border-blue-500 focus:outline-none px-4 py-2 h-24"
                 ></textarea>
