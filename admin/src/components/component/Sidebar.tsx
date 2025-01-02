@@ -1,7 +1,8 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Truck, Info } from 'lucide-react';
 import { Button } from '../ui/button';
-import toast from "react-hot-toast"
+import { useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 const menuItems = [
   { name: 'Banner', icon: Home, href: '/banner' },
@@ -11,19 +12,63 @@ const menuItems = [
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
-
+  // Logout handler
   const handleLogout = () => {
     // Remove token from localStorage
-    localStorage.removeItem("token")
+    localStorage.removeItem('token');
 
     // Show success toast
-    toast.success("Logged out successfully!", {
+    toast.success('Logged out successfully!', {
       duration: 3000, // Toast will disappear after 3 seconds
-    })
-    // Optionally, redirect to login page
-    window.location.href = "/"
-  }
+    });
+
+    // Redirect to login page
+    navigate('/');
+  };
+
+  // Token validation
+  useEffect(() => {
+    const checkToken = () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('Session expired. Please log in again.');
+        navigate('/');
+        return;
+      }
+
+      // Decode and validate token expiry if applicable
+      try {
+        const tokenData = JSON.parse(atob(token.split('.')[1])); // Decode JWT payload
+        const isExpired = tokenData.exp * 1000 < Date.now();
+        if (isExpired) {
+          localStorage.removeItem('token'); // Clear invalid token
+          toast.error('Session expired. Please log in again.');
+          navigate('/');
+        }
+      } catch (error) {
+        console.error('Invalid token format:', error);
+        localStorage.removeItem('token'); // Clear malformed token
+        toast.error('Session expired or invalid. Please log in again.');
+        navigate('/');
+      }
+    };
+
+    // Initial token check  
+    checkToken();
+
+    // Listen for manual token removal or updates
+    const handleStorageChange = () => {
+      checkToken();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [navigate]);
 
   return (
     <div className="flex flex-col w-64 bg-gray-800 h-screen">
@@ -48,10 +93,10 @@ const Sidebar = () => {
           ))}
         </ul>
         <div className="flex justify-center mt-4">
-        <Button onClick={handleLogout} variant="destructive" className="w-full md:w-auto">
-          Logout
-        </Button>
-      </div>
+          <Button onClick={handleLogout} variant="destructive" className="w-full md:w-auto">
+            Logout
+          </Button>
+        </div>
       </nav>
     </div>
   );

@@ -15,10 +15,10 @@ export function LoginForm({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    const userData = { username, password }
-
+    e.preventDefault();
+  
+    const userData = { username, password };
+  
     try {
       const response = await fetch("http://localhost:3000/api/admin/login", {
         method: "POST",
@@ -26,42 +26,50 @@ export function LoginForm({
           "Content-Type": "application/json",
         },
         body: JSON.stringify(userData),
-      })
-
+      });
+    
+      console.log("Response Status:", response.status);
+    
       if (!response.ok) {
-        throw new Error("Login failed. Please check your credentials.")
+        throw new Error("Invalid username or password.");
       }
-
-      const data = await response.json()
-      console.log(data)
-      // Store token in localStorage
-      localStorage.setItem("token", data.token)
-
-      // Reset error message on successful login
-      setErrorMessage(null)
-
+    
+      const data = await response.json();
+      console.log("Response Data:", data);
+    
+      // Ensure token exists
+      if (!data.token) {
+        throw new Error("Missing token in response.");
+      }
+    
+      localStorage.setItem("token", data.token);
+    
       // Show success toast
-      toast.success("Login successful!", {
-        duration: 3000, // Adjust the duration if necessary
-      })
-
-      // Redirect to another page (e.g., dashboard)
-      window.location.href = "/banner"
-
-    } catch (err: unknown) {
-      // Handle the error correctly by narrowing the type
-      if (err instanceof Error) {
-        setErrorMessage(err.message) // If err is an instance of Error
-      } else {
-        setErrorMessage("An unexpected error occurred.")
-      }
-
-      // Show error toast
-      toast.error(errorMessage || "An unexpected error occurred.", {
-        duration: 3000,
-      })
+      toast.success("Login successful!", { duration: 3000 });
+    
+      // Delay redirection to allow toast to display
+      setTimeout(() => {
+        window.location.href = "/banner";
+      }, 1000); // 1-second delay
     }
-  }
+    catch (err: unknown) {
+      let errorMessage = "An unexpected error occurred.";
+  
+      // Handle specific error scenarios
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+  
+      // Show error toast
+      toast.error(errorMessage, {
+        duration: 3000,
+      });
+  
+      // Optionally set the error message for UI display
+      setErrorMessage(errorMessage);
+    }
+  };
+  
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
