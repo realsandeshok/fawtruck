@@ -110,11 +110,11 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     } else {
       const error = await response.json();
       console.error('Error response:', error);
-      alert('Error saving banner');
+      toast.error('Error saving banner');
     }
   } catch (error) {
     console.error('Error saving banner:', error);
-    alert('Error saving banner');
+    toast.error('Error saving banner');
   }
 };
 
