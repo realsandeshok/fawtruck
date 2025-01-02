@@ -3,15 +3,15 @@ import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import MyImage from "../assets/1.png"; // Adjust the path as needed
 
-function About() {
+function About({language}) {
   const [aboutData, setAboutData] = useState(null);
-  const [language, setLanguage] = useState("en"); // Default to English
+  // const [language, setLanguage] = useState("en"); // Default to English
 
-  // Detect language from URL
-  useEffect(() => {
-    const currentPath = window.location.pathname; // Example: "/ar" for Arabic
-    setLanguage(currentPath.includes("/ar") ? "ar" : "en");
-  }, []);
+  // // Detect language from URL
+  // useEffect(() => {
+  //   const currentPath = window.location.pathname; // Example: "/ar" for Arabic
+  //   setLanguage(currentPath.includes("/ar") ? "ar" : "en");
+  // }, []);
 
   // Fetch data from API
   useEffect(() => {

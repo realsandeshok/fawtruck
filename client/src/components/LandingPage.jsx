@@ -33,10 +33,11 @@ import Contact from "./Contact";
 
 export default function Home() {
   const [truckModels, setTruckModels] = useState([]);
-  const [language, setLanguage] = useState("en"); // Default to English
+  const [language, setLanguage] = useState('en'); // Manage state here
+
   useEffect(() => {
-    const currentPath = window.location.pathname; // Example: "/ar" for Arabic
-    setLanguage(currentPath.includes("/ar") ? "ar" : "en");
+    const currentPath = window.location.pathname; // Check current path
+    setLanguage(currentPath.includes('/ar') ? 'ar' : 'en'); // Determine language
   }, []);
 
   // Left side (Contact form) animation
@@ -101,7 +102,7 @@ export default function Home() {
         className="relative  from-blue-900 to-blue-700 text-white "
       >
         <div>Hii</div>
-        <Navbar />
+        <Navbar language={language} setLanguage={setLanguage}/>
         <Carousel className="" />
         {/* Overlay for better text visibility */}
       </section>
@@ -157,16 +158,16 @@ export default function Home() {
       </section>
 
       {/* About Us Section */}
-      <About id="About" />
+      <About id="About" language={language}/>
 
       {/* Contact Section */}
-      <Contact id="Contact" />
+      <Contact id="Contact" language={language}/>
 
       {/* Map section */}
       <Map />
 
       {/* Footer */}
-      <Footer />
+      <Footer language={language}/>
     </main>
   );
 }
