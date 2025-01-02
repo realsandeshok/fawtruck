@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 interface TruckModel {
   id: number;
   truck_name: string;
+  truck_name_ar: string;
   image_url: string;
 }
 
@@ -45,6 +46,12 @@ const TruckModels = () => {
   }, []); // Empty dependency array to run only on mount
 
   const openModal = (model: TruckModel | null = null) => {
+    // Check if the number of truck models is less than 5
+    if (truckModels.length >= 5) {
+      toast.error('You can only add up to 5 truck models.');
+      return;
+    }
+
     setCurrentModel(model);
     setIsModalOpen(true);
     setSelectedFile(null); // Clear selected file when opening modal
@@ -73,6 +80,7 @@ const TruckModels = () => {
 
     const formData = new FormData();
     formData.append('truck_name', ((e.target as HTMLFormElement).elements.namedItem('name') as HTMLInputElement)?.value || '');
+    formData.append('truck_name_ar', ((e.target as HTMLFormElement).elements.namedItem('name_ar') as HTMLInputElement)?.value || '');
     if (selectedFile) {
       formData.append('image', selectedFile); // Append the image file
     }
@@ -167,7 +175,8 @@ const TruckModels = () => {
         <table className="min-w-full bg-white border border-gray-300">
           <thead>
             <tr>
-              <th className="px-6 py-3 border-b text-start">Name</th>
+              <th className="px-6 py-3 border-b text-start">Name (English)</th>
+              <th className="px-6 py-3 border-b text-start">Name (Arabic)</th>
               <th className="px-6 py-3 border-b text-start">Image</th>
               <th className="px-6 py-3 border-b text-start">Actions</th>
             </tr>
@@ -176,6 +185,7 @@ const TruckModels = () => {
             {truckModels.map((model) => (
               <tr key={model.id}>
                 <td className="px-6 py-4 border-b">{model.truck_name}</td>
+                <td className="px-6 py-4 border-b">{model.truck_name_ar}</td>
                 <td className="px-6 py-4 border-b">
                   <img src={model.image_url} alt={model.truck_name} className="w-20 h-20 object-cover" />
                 </td>
@@ -199,13 +209,24 @@ const TruckModels = () => {
             <h2 className="text-xl font-bold mb-4">{currentModel ? 'Edit Truck Model' : 'Add Truck Model'}</h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label htmlFor="name" className="block mb-1">Name</label>
+                <label htmlFor="name" className="block mb-1">Name (English)</label>
                 <input
                   type="text"
                   id="name"
                   name="name"
                   className="w-full border rounded-md px-3 py-2"
                   defaultValue={currentModel?.truck_name || ''}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="name_ar" className="block mb-1">Name (Arabic)</label>
+                <input
+                  type="text"
+                  id="name_ar"
+                  name="name_ar"
+                  className="w-full border rounded-md px-3 py-2"
+                  defaultValue={currentModel?.truck_name_ar || ''}
                   required
                 />
               </div>
