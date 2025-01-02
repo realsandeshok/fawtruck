@@ -16,12 +16,12 @@ import img1 from "../assets/img1.png";
 import logo2 from "../assets/logo2.png";
 import img2 from "../assets/Frame.png";
 
-function Footer() {
-  const [language, setLanguage] = useState("en"); // Default to English
-  useEffect(() => {
-    const currentPath = window.location.pathname; // Example: "/ar" for Arabic
-    setLanguage(currentPath.includes("/ar") ? "ar" : "en");
-  }, []);
+function Footer({language}) {
+  // const [language, setLanguage] = useState("en"); // Default to English
+  // useEffect(() => {
+  //   const currentPath = window.location.pathname; // Example: "/ar" for Arabic
+  //   setLanguage(currentPath.includes("/ar") ? "ar" : "en");
+  // }, []);
 
   return (
     <>

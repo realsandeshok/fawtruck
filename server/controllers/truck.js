@@ -42,21 +42,21 @@ const upload = multer({
 // API to create a truck model with image upload
 app.post('/trucks', upload.single('image'), async (req, res) => {
     try {
-        const { truck_name, visibility } = req.body;
+        const { truck_name, truck_name_ar, visibility } = req.body;
         const image = req.file ? req.file.filename : null;
 
         // Validate input
-        if (!truck_name || !image) {
+        if (!truck_name || !truck_name_ar || !image) {
             return res.status(400).json({ message: 'Truck name and image are required.' });
         }
 
         // SQL query to insert a new truck model
         const query = `
-            INSERT INTO truck_models (truck_name, image, visibility)
-            VALUES ($1, $2, $3) RETURNING *;
+            INSERT INTO truck_models (truck_name, truck_name_ar, image, visibility)
+            VALUES ($1, $2, $3, $4) RETURNING *;
         `;
 
-        const result = await db.query(query, [truck_name, image, visibility || false]);
+        const result = await db.query(query, [truck_name, truck_name_ar, image, visibility || false]);
 
         res.status(201).json({
             message: 'Truck model created successfully.',
@@ -117,11 +117,11 @@ app.get('/trucks/:id', async (req, res) => {
 app.put('/trucks/:id', upload.single('image'), async (req, res) => {
     try {
         const { id } = req.params;
-        const { truck_name, visibility } = req.body;
+        const { truck_name, truck_name_ar, visibility } = req.body;
         const image = req.file ? req.file.filename : null;
 
         // Validate input
-        if (!truck_name) {
+        if (!truck_name || !truck_name_ar) {
             return res.status(400).json({ message: 'Truck name is required.' });
         }
 
@@ -129,17 +129,17 @@ app.put('/trucks/:id', upload.single('image'), async (req, res) => {
         if (image) {
             query = `
                 UPDATE truck_models
-                SET truck_name = $1, image = $2, visibility = $3
-                WHERE id = $4 RETURNING *;
+                SET truck_name = $1, truck_name_ar = $2, image = $3, visibility = $4
+                WHERE id = $5 RETURNING *;
             `;
-            params = [truck_name, image, visibility, id];
+            params = [truck_name, truck_name_ar, image, visibility, id];
         } else {
             query = `
                 UPDATE truck_models
-                SET truck_name = $1, visibility = $2
-                WHERE id = $3 RETURNING *;
+                SET truck_name = $1, truck_name_ar = $2, visibility = $3
+                WHERE id = $4 RETURNING *;
             `;
-            params = [truck_name, visibility, id];
+            params = [truck_name, truck_name_ar, visibility, id];
         }
 
         const result = await db.query(query, params);

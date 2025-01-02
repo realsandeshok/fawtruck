@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Facebook, Instagram, Youtube } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 
-export default function Contact() {
+export default function Contact({language}) {
   const { ref: leftRef, inView } = useInView({
     triggerOnce: false,
   });
@@ -12,11 +12,11 @@ export default function Contact() {
     triggerOnce: false,
   });
 
-  const [language, setLanguage] = useState("en"); // Default to English
-  useEffect(() => {
-    const currentPath = window.location.pathname; // Example: "/ar" for Arabic
-    setLanguage(currentPath.includes("/ar") ? "ar" : "en");
-  }, []);
+  // const [language, setLanguage] = useState("en"); // Default to English
+  // useEffect(() => {
+  //   const currentPath = window.location.pathname; // Example: "/ar" for Arabic
+  //   setLanguage(currentPath.includes("/ar") ? "ar" : "en");
+  // }, []);
 
   return (
     <>

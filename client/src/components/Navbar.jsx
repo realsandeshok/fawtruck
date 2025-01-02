@@ -1,15 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import img1 from "../assets/img1.png"; // Ensure the correct path
 import logo2 from "../assets/logo2.png"; // Ensure the correct path
 import { Link } from "react-scroll";
 
-export function Navbar() {
+export function Navbar({ language, setLanguage }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [language, setLanguage] = useState("en"); // Default language: English
-  useEffect(() => {
-    const currentPath = window.location.pathname; // Example: "/ar" for Arabic
-    setLanguage(currentPath.includes("/ar") ? "ar" : "en");
-  }, []);
+  const toggleLanguage = () => {
+    const newLanguage = language === "en" ? "ar" : "en";
+    const newPath = window.location.pathname.includes("/ar") ? "/en" : "/ar";
+    window.location.pathname = newPath; // Redirects to new URL
+    setLanguage(newLanguage); // Update state in LandingPage
+  };
 
   return (
     <>
@@ -46,7 +47,6 @@ export function Navbar() {
                 />
               </svg>
             </button>
-
             {/* Navbar Links */}
             <ul
               className={`md:flex md:space-x-4 md:items-center absolute md:static top-[60px] left-0 w-full md:w-auto bg-[#00308F] md:bg-transparent transition-all duration-300 ease-in-out ${
@@ -105,6 +105,14 @@ export function Navbar() {
                   </button>
                 </Link>
               </li>
+              <li className="flex justify-center items-center ">
+                <button
+                  className="px-3 py-1 text-white rounded-lg transition text-sm md:text-base"
+                  onClick={toggleLanguage}
+                >
+                  {language === "en" ? "Arabic" : "English"}
+                </button>
+              </li>
             </ul>
           </div>
         </nav>
@@ -117,6 +125,14 @@ export function Navbar() {
                 isMenuOpen ? "block" : "hidden"
               } ${language === "ar" ? "text-right" : ""}`}
             >
+              <li className="flex justify-center items-center ">
+                <button
+                  className="px-3 py-1 text-white rounded-lg transition text-sm md:text-base"
+                  onClick={toggleLanguage}
+                >
+                  {language === "en" ? "Arabic" : "English"}
+                </button>
+              </li>
               <li className="flex justify-center items-center border-b border-gray-700 md:border-none">
                 <Link
                   to="#"
@@ -172,7 +188,6 @@ export function Navbar() {
                 </Link>
               </li>
             </ul>
-
             {/* Logo Section */}
             <div className="flex items-center ">
               <img src={img1} alt="Logo 1" className="h-10 md:h-14" />
