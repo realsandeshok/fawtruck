@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Truck, Info } from 'lucide-react';
+import { Home, Truck, Info, PhoneCall } from 'lucide-react';
+
 import { Button } from '../ui/button';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
@@ -8,6 +9,7 @@ const menuItems = [
   { name: 'Banner', icon: Home, href: '/banner' },
   { name: 'Truck Models', icon: Truck, href: '/truckmodels' },
   { name: 'About Us', icon: Info, href: '/about' },
+  { name: 'Enquires', icon: PhoneCall, href: '/enquires' },
 ];
 
 const Sidebar = () => {
