@@ -28,7 +28,7 @@ const Banner = () => {
       }
     
       try {
-        const response = await fetch('http://localhost:3000/api/admin/banner', {
+        const response = await fetch(AdminBanners, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
