@@ -59,20 +59,20 @@ const AboutUs = () => {
         if (updatedContent && updatedContent.about) {
           setContent(updatedContent.about); // Set the updated content directly
           setIsEditing(false); // Exit editing mode
-          alert("Content saved successfully!");
+          toast.success("Content saved successfully!");
         } else {
           console.error("Unexpected response format:", updatedContent);
-          alert("Error saving content");
+          toast.error("Unexpected response from the server.");
         }
       } else {
         // Parse and log the error response
         const errorData = await response.json();
         console.error("Error response:", errorData);
-        alert(`Error saving content: ${errorData.message || "Unknown error"}`);
+        toast.error(`Error saving content: ${errorData.message || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Error saving about data:", error);
-      alert("Error saving content");
+      toast.error("An error occurred while saving the content.");
     }
   };
 
@@ -114,11 +114,13 @@ const AboutUs = () => {
             description_ar: latestContent.description_ar,
             // imageUrl: latestContent.imageUrl || '/placeholder.svg', /// Set a default image if not provided
           });
+          toast.success("Content loaded successfully!");
         } else {
-          console.log("No content available");
+          toast.error("No content available to display.");
         }
       } catch (error) {
         console.error("Error fetching about data:", error);
+        toast.error("Failed to load content. Please try again.");
       }
     };
 

@@ -34,11 +34,13 @@ const TruckModels = () => {
 
         if (response.ok && data.trucks) {
           setTruckModels(data.trucks);
+          toast.success('Truck models fetched successfully!'); // Success toast
         } else {
-          console.error('Failed to fetch truck models');
+          toast.error('Failed to fetch truck models.');
         }
       } catch (error) {
         console.error('Error fetching truck models:', error);
+        toast.error('Error fetching truck models.');
       }
     };
 
@@ -46,12 +48,12 @@ const TruckModels = () => {
   }, []); // Empty dependency array to run only on mount
 
   const openModal = (model: TruckModel | null = null) => {
-    // Check if the number of truck models is less than 5
-    if (truckModels.length >= 5) {
+    // Check if the number of truck models is less than 5 and if it's a new model (model is null)
+    if (model === null && truckModels.length >= 5) {
       toast.error('You can only add up to 5 truck models.');
       return;
     }
-
+  
     setCurrentModel(model);
     setIsModalOpen(true);
     setSelectedFile(null); // Clear selected file when opening modal
@@ -114,11 +116,11 @@ const TruckModels = () => {
         }
         closeModal();
       } else {
-        alert('Error saving truck model');
+        toast.error(`Error ${currentModel ? 'updating' : 'creating'} truck model.`);
       }
     } catch (error) {
       console.error('Error saving truck model:', error);
-      alert('Error saving truck model');
+      toast.error('Error saving truck model.');
     }
   };
 
@@ -147,11 +149,11 @@ const TruckModels = () => {
       } else {
         const error = await response.json();
         console.error('Error response:', error);
-        alert('Error deleting truck model');
+        toast.error('Error deleting truck model.');
       }
     } catch (error) {
       console.error('Error deleting truck model:', error);
-      alert('Error deleting truck model');
+      toast.error('Error deleting truck model.');
     }
   }
 };

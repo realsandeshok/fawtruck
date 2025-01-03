@@ -35,7 +35,9 @@ const Sidebar = () => {
     const checkToken = () => {
       const token = localStorage.getItem('token');
       if (!token) {
-        toast.error('Session expired. Please log in again.');
+        toast.error('Session expired. Please log in again.', {
+          duration: 3000,
+        });
         navigate('/');
         return;
       }
@@ -46,13 +48,17 @@ const Sidebar = () => {
         const isExpired = tokenData.exp * 1000 < Date.now();
         if (isExpired) {
           localStorage.removeItem('token'); // Clear invalid token
-          toast.error('Session expired. Please log in again.');
+          toast.error('Session expired. Please log in again.', {
+            duration: 3000,
+          });
           navigate('/');
         }
       } catch (error) {
         console.error('Invalid token format:', error);
         localStorage.removeItem('token'); // Clear malformed token
-        toast.error('Session expired or invalid. Please log in again.');
+        toast.error('Session expired or invalid. Please log in again.', {
+          duration: 3000,
+        });
         navigate('/');
       }
     };
@@ -83,9 +89,8 @@ const Sidebar = () => {
             <li key={item.name}>
               <Link to={item.href}>
                 <span
-                  className={`flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 ${
-                    location.pathname === item.href ? 'bg-gray-700' : ''
-                  }`}
+                  className={`flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 ${location.pathname === item.href ? 'bg-gray-700' : ''
+                    }`}
                 >
                   <item.icon className="mr-3 h-5 w-5" />
                   {item.name}

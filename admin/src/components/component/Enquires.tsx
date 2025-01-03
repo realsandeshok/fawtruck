@@ -6,7 +6,8 @@ interface Enquiry {
   id: number;
   name: string;
   country: string;
-  contact: string;
+  contact: number;
+  email: string; // Added email field
   message: string;
   created_at: string;
   updated_at: string;
@@ -25,20 +26,20 @@ const Enquires = () => {
           throw new Error("Failed to fetch enquiries");
         }
         const data = await response.json();
-        console.log("Fetched data:", data);  // Log fetched data for debugging
+        console.log("Fetched data:", data);
 
-        // Ensure the enquiries data exists and is an array
         if (data && Array.isArray(data.enquiries)) {
           setEnquiries(data.enquiries);
+          toast.success("Enquiries fetched successfully");
         } else {
           console.error("Fetched data is not in the expected format:", data);
-          setEnquiries([]);  // Fallback to an empty array if the data is not in the expected format
-          toast.error("Invalid data format");
+          setEnquiries([]);
+          toast.error("Invalid data format received");
         }
       } catch (error) {
         console.error("Error fetching enquiries:", error);
         toast.error("Failed to fetch enquiries");
-        setEnquiries([]);  // Fallback to an empty array on error
+        setEnquiries([]);
       }
     };
 
@@ -70,10 +71,11 @@ const Enquires = () => {
           <table className="min-w-full bg-white shadow-md rounded-lg">
             <thead>
               <tr className="bg-gray-200 text-gray-700">
-                <th className="px-4 py-2 text-left">ID</th>
+                {/* <th className="px-4 py-2 text-left">ID</th> */}
                 <th className="px-4 py-2 text-left">Name</th>
                 <th className="px-4 py-2 text-left">Country</th>
                 <th className="px-4 py-2 text-left">Contact</th>
+                <th className="px-4 py-2 text-left">Email</th>
                 <th className="px-4 py-2 text-left">Message</th>
                 <th className="px-4 py-2 text-left">Date</th>
                 <th className="px-4 py-2 text-left">Actions</th>
@@ -82,10 +84,11 @@ const Enquires = () => {
             <tbody>
               {enquiries.map((enquiry) => (
                 <tr key={enquiry.id} className="border-t hover:bg-gray-100">
-                  <td className="px-4 py-2">{enquiry.id}</td>
+                  {/* <td className="px-4 py-2">{enquiry.id}</td> */}
                   <td className="px-4 py-2">{enquiry.name}</td>
                   <td className="px-4 py-2">{enquiry.country}</td>
                   <td className="px-4 py-2">{enquiry.contact}</td>
+                  <td className="px-4 py-2">{enquiry.email}</td>
                   <td className="px-4 py-2">{enquiry.message}</td>
                   <td className="px-4 py-2">{formatDate(enquiry.created_at)}</td>
                   <td className="px-4 py-2">
@@ -124,6 +127,9 @@ const Enquires = () => {
             </p>
             <p>
               <strong>Contact:</strong> {selectedEnquiry.contact}
+            </p>
+            <p>
+              <strong>Email:</strong> {selectedEnquiry.email}
             </p>
             <p>
               <strong>Message:</strong> {selectedEnquiry.message}

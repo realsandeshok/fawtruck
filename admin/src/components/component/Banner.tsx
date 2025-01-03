@@ -36,12 +36,15 @@ const Banner = () => {
         if (response.ok) {
           const data = await response.json();
           setBanners(data.banners); // Assuming the response contains a "banners" array
+          toast.success('Banners fetched successfully!'); // Success toast
         } else {
           const errorText = await response.text();
           console.error(`Error fetching banners: ${response.status}`, errorText);
+          toast.error('Failed to fetch banners.');
         }
       } catch (error) {
         console.error('Error fetching banners:', error);
+        toast.error('Error occurred while fetching banners.');
       }
     };
     
@@ -105,6 +108,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       if (bannersResponse.ok) {
         const bannersData = await bannersResponse.json();
         setBanners(bannersData.banners); // Update state with latest banners
+        toast.success(currentBanner ? 'Banner updated successfully!' : 'Banner created successfully!');
       }
       closeModal();
     } else {
@@ -137,14 +141,15 @@ const handleDelete = async (id: number) => {
 
       if (response.ok) {
         setBanners(banners.filter((banner) => banner.id !== id));
+        toast.success('Banner deleted successfully!');
       } else {
         const error = await response.json();
         console.error('Error response:', error);
-        alert('Error deleting banner');
+        toast.error('Failed to delete banner.');
       }
     } catch (error) {
       console.error('Error deleting banner:', error);
-      alert('Error deleting banner');
+      toast.error('Error occurred while deleting banner.');
     }
   }
 };
