@@ -1,177 +1,187 @@
-const express = require('express');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const db = require('../db/db')
-
+const express = require("express");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+const db = require("../db/db");
+const { verifyAdmin } = require("../middleware/authMiddleware");
 
 const app = express();
 
 // Directory to store uploaded images
-const UPLOADS_DIR = path.join(__dirname, 'banner_uploads');
+const UPLOADS_DIR = path.join(__dirname, "banner_uploads");
 
 // Ensure the uploads directory exists
 if (!fs.existsSync(UPLOADS_DIR)) {
-    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 
 // Multer configuration
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, UPLOADS_DIR);
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    },
+  destination: (req, file, cb) => {
+    cb(null, UPLOADS_DIR);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
 });
 
 const upload = multer({
-    storage,
-    fileFilter: (req, file, cb) => {
-        const filetypes = /jpeg|jpg|png|gif/;
-        const mimetype = filetypes.test(file.mimetype);
-        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+  storage,
+  fileFilter: (req, file, cb) => {
+    const filetypes = /jpeg|jpg|png|gif/;
+    const mimetype = filetypes.test(file.mimetype);
+    const extname = filetypes.test(
+      path.extname(file.originalname).toLowerCase()
+    );
 
-        if (mimetype && extname) {
-            return cb(null, true);
-        }
-        cb(new Error('Only image files are allowed.'));
-    },
-    limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
-})
+    if (mimetype && extname) {
+      return cb(null, true);
+    }
+    cb(new Error("Only image files are allowed."));
+  },
+  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+});
 
 // Upload Image Endpoint
-app.post('/upload-banner', upload.single('image'), async (req, res) => {
+app.post(
+  "/upload-banner",
+  upload.single("image"),
+  verifyAdmin,
+  async (req, res) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({ message: 'No file uploaded.' });
-        }
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded." });
+      }
 
-        const fileName = req.file.filename;
-        const filePath = path.join('banner_uploads', fileName);
+      const fileName = req.file.filename;
+      const filePath = path.join("banner_uploads", fileName);
 
-        // Generate a unique ID for the image
-        // const actual_id = Date.now() // You can use UUID for more robust unique ID generation
-        // const id = parseInt(actual_id.toString().slice(0, 2), 10);
-        // Add uploaded_at timestamp
-        const uploadedAt = new Date();
+      // Generate a unique ID for the image
+      // const actual_id = Date.now() // You can use UUID for more robust unique ID generation
+      // const id = parseInt(actual_id.toString().slice(0, 2), 10);
+      // Add uploaded_at timestamp
+      const uploadedAt = new Date();
 
-        // Save file metadata to the database
-        const query = `
+      // Save file metadata to the database
+      const query = `
             INSERT INTO images (file_name, file_path, uploaded_at)
             VALUES ($1, $2, $3) RETURNING *;
         `;
-        const result = await db.query(query, [fileName, filePath, uploadedAt]);
+      const result = await db.query(query, [fileName, filePath, uploadedAt]);
 
-        res.status(201).json({
-            message: 'Image uploaded successfully.',
-            image: result.rows[0],
-        });
+      res.status(201).json({
+        message: "Image uploaded successfully.",
+        image: result.rows[0],
+      });
     } catch (err) {
-        console.error('Error uploading image:', err.message);
-        res.status(500).json({ message: 'Internal server error.' });
+      console.error("Error uploading image:", err.message);
+      res.status(500).json({ message: "Internal server error." });
     }
-});
+  }
+);
 
 // GET ALL THE BANNERS
-app.get('/banner', async (req, res) => {
-    try {
-        // Fetch all banner data from the database
-        const query = `
+app.get("/banner", async (req, res) => {
+  try {
+    // Fetch all banner data from the database
+    const query = `
             SELECT id, file_name, file_path, uploaded_at
             FROM images
             ORDER BY uploaded_at DESC;
         `;
-        const result = await db.query(query);
+    const result = await db.query(query);
 
-        // Construct full image URLs
-        const baseURL = `${req.protocol}://${req.get('host')}`;
-        const banners = result.rows.map(banner => ({
-            ...banner,
-            image_url: `${baseURL}/${banner.file_path}`
-        }));
+    // Construct full image URLs
+    const baseURL = `${req.protocol}://${req.get("host")}`;
+    const banners = result.rows.map((banner) => ({
+      ...banner,
+      image_url: `${baseURL}/${banner.file_path}`,
+    }));
 
-        // console.log(banners)
-        // Respond with the banner data
-        res.status(200).json({
-            message: 'Banners retrieved successfully.',
-            banners,
-        });
-    } catch (err) {
-        console.error('Error fetching banners:', err.message);
-        res.status(500).json({ message: 'Internal server error.' });
-    }
+    // console.log(banners)
+    // Respond with the banner data
+    res.status(200).json({
+      message: "Banners retrieved successfully.",
+      banners,
+    });
+  } catch (err) {
+    console.error("Error fetching banners:", err.message);
+    res.status(500).json({ message: "Internal server error." });
+  }
 });
 
 // DELETE a banner by ID
-app.delete('/banner/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
+app.delete("/banner/:id", verifyAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
 
-        // Fetch the banner details to get the file path
-        const selectQuery = `SELECT file_path FROM images WHERE id = $1;`;
-        const selectResult = await db.query(selectQuery, [id]);
+    // Fetch the banner details to get the file path
+    const selectQuery = `SELECT file_path FROM images WHERE id = $1;`;
+    const selectResult = await db.query(selectQuery, [id]);
 
-        if (selectResult.rows.length === 0) {
-            return res.status(404).json({ message: 'Banner not found.' });
-        }
-
-        const { file_path: filePath } = selectResult.rows[0];
-        const fullPath = path.join(__dirname, filePath);
-
-        // Delete the file from the server
-        if (fs.existsSync(fullPath)) {
-            fs.unlinkSync(fullPath);
-        } else {
-            console.warn(`File not found: ${fullPath}`);
-        }
-
-        // Delete the banner record from the database
-        const deleteQuery = `DELETE FROM images WHERE id = $1;`;
-        await db.query(deleteQuery, [id]);
-
-        res.status(200).json({ message: 'Banner deleted successfully.' });
-    } catch (err) {
-        console.error('Error deleting banner:', err.message);
-        res.status(500).json({ message: 'Internal server error.' });
+    if (selectResult.rows.length === 0) {
+      return res.status(404).json({ message: "Banner not found." });
     }
+
+    const { file_path: filePath } = selectResult.rows[0];
+    const fullPath = path.join(__dirname, filePath);
+
+    // Delete the file from the server
+    if (fs.existsSync(fullPath)) {
+      fs.unlinkSync(fullPath);
+    } else {
+      console.warn(`File not found: ${fullPath}`);
+    }
+
+    // Delete the banner record from the database
+    const deleteQuery = `DELETE FROM images WHERE id = $1;`;
+    await db.query(deleteQuery, [id]);
+
+    res.status(200).json({ message: "Banner deleted successfully." });
+  } catch (err) {
+    console.error("Error deleting banner:", err.message);
+    res.status(500).json({ message: "Internal server error." });
+  }
 });
 
-
 // Update a banner by ID
-app.put('/banner/:id', upload.single('image'), async (req, res) => {
+app.put(
+  "/banner/:id",
+  upload.single("image"),
+  verifyAdmin,
+  async (req, res) => {
     try {
-        const { id } = req.params;
+      const { id } = req.params;
 
-        // Fetch the existing banner details
-        const selectQuery = `SELECT file_path FROM images WHERE id = $1;`;
-        const selectResult = await db.query(selectQuery, [id]);
+      // Fetch the existing banner details
+      const selectQuery = `SELECT file_path FROM images WHERE id = $1;`;
+      const selectResult = await db.query(selectQuery, [id]);
 
-        if (selectResult.rows.length === 0) {
-            return res.status(404).json({ message: 'Banner not found.' });
+      if (selectResult.rows.length === 0) {
+        return res.status(404).json({ message: "Banner not found." });
+      }
+
+      const { file_path: oldFilePath } = selectResult.rows[0];
+      const oldFullPath = path.join(__dirname, oldFilePath);
+
+      // If a new image is provided, update the file
+      let newFileName = null;
+      let newFilePath = null;
+
+      if (req.file) {
+        newFileName = req.file.filename;
+        newFilePath = path.join("banner_uploads", newFileName);
+
+        // Delete the old file from the server
+        if (fs.existsSync(oldFullPath)) {
+          fs.unlinkSync(oldFullPath);
+        } else {
+          console.warn(`Old file not found: ${oldFullPath}`);
         }
+      }
 
-        const { file_path: oldFilePath } = selectResult.rows[0];
-        const oldFullPath = path.join(__dirname, oldFilePath);
-
-        // If a new image is provided, update the file
-        let newFileName = null;
-        let newFilePath = null;
-
-        if (req.file) {
-            newFileName = req.file.filename;
-            newFilePath = path.join('banner_uploads', newFileName);
-
-            // Delete the old file from the server
-            if (fs.existsSync(oldFullPath)) {
-                fs.unlinkSync(oldFullPath);
-            } else {
-                console.warn(`Old file not found: ${oldFullPath}`);
-            }
-        }
-
-        // Update the database record
-        const updateQuery = `
+      // Update the database record
+      const updateQuery = `
             UPDATE images
             SET file_name = COALESCE($1, file_name),
                 file_path = COALESCE($2, file_path),
@@ -179,18 +189,23 @@ app.put('/banner/:id', upload.single('image'), async (req, res) => {
             WHERE id = $4
             RETURNING *;
         `;
-        const uploadedAt = req.file ? new Date() : null; // Only update uploaded_at if a new file is uploaded
-        const updateResult = await db.query(updateQuery, [newFileName, newFilePath, uploadedAt, id]);
+      const uploadedAt = req.file ? new Date() : null; // Only update uploaded_at if a new file is uploaded
+      const updateResult = await db.query(updateQuery, [
+        newFileName,
+        newFilePath,
+        uploadedAt,
+        id,
+      ]);
 
-        res.status(200).json({
-            message: 'Banner updated successfully.',
-            banner: updateResult.rows[0],
-        });
+      res.status(200).json({
+        message: "Banner updated successfully.",
+        banner: updateResult.rows[0],
+      });
     } catch (err) {
-        console.error('Error updating banner:', err.message);
-        res.status(500).json({ message: 'Internal server error.' });
+      console.error("Error updating banner:", err.message);
+      res.status(500).json({ message: "Internal server error." });
     }
-});
-
+  }
+);
 
 module.exports = app;

@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
 const db = require('../db/db'); // Ensure this is your database connection file
+const { verifyAdmin } = require('../middleware/authMiddleware');
 
 const app = express();
 
@@ -40,7 +41,7 @@ const upload = multer({
 });
 
 // API to create a truck model with image upload
-app.post('/trucks', upload.single('image'), async (req, res) => {
+app.post('/trucks', upload.single('image'), verifyAdmin, async (req, res) => {
     try {
         const { truck_name, truck_name_ar, visibility } = req.body;
         const image = req.file ? req.file.filename : null;
@@ -114,7 +115,7 @@ app.get('/trucks/:id', async (req, res) => {
 });
 
 // API to update a truck model by ID
-app.put('/trucks/:id', upload.single('image'), async (req, res) => {
+app.put('/trucks/:id', upload.single('image'), verifyAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         const { truck_name, truck_name_ar, visibility } = req.body;

@@ -1,12 +1,13 @@
 const express = require('express');
 const app = express();
 const db = require('../db/db');
+const { verifyAdmin } = require('../middleware/authMiddleware');
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
 
 // API to add "About" content
-app.post('/about', async (req, res) => {
+app.post('/about',verifyAdmin, async (req, res) => {
     try {
         const { title, description, title_ar, description_ar } = req.body;
 
@@ -50,7 +51,7 @@ app.get('/about', async (req, res) => {
 });
 
 // API to update "About" content by ID
-app.put('/about/:id', async (req, res) => {
+app.put('/about/:id',verifyAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         const { title, description, title_ar, description_ar } = req.body;
@@ -84,7 +85,7 @@ app.put('/about/:id', async (req, res) => {
 });
 
 // API to delete "About" content by ID
-app.delete('/about/:id', async (req, res) => {
+app.delete('/about/:id',verifyAdmin, async (req, res) => {
     try {
         const { id } = req.params;
 

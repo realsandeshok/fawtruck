@@ -2,52 +2,53 @@ const express = require("express");
 const app = express();
 const db = require("../db/db");
 const nodemailer = require("nodemailer");
+const { verifyAdmin } = require("../middleware/authMiddleware");
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
 
 // API to add a new enquiry
 app.post("/enquiries", async (req, res) => {
-    try {
-      const { name, country, contact, email, message } = req.body;
-  
-      // Validate input
-      if (!name || !country || !contact || !email || !message) {
-        return res.status(400).json({
-          message: "Name, country, contact, email, and message are required.",
-        });
-      }
-  
-      // SQL query to insert the enquiry into the database
-      const query = `
+  try {
+    const { name, country, contact, email, message } = req.body;
+
+    // Validate input
+    if (!name || !country || !contact || !email || !message) {
+      return res.status(400).json({
+        message: "Name, country, contact, email, and message are required.",
+      });
+    }
+
+    // SQL query to insert the enquiry into the database
+    const query = `
         INSERT INTO enquiries (name, country, contact, email, message, created_at)
         VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING *;
       `;
-  
-      const result = await db.query(query, [
-        name,
-        country,
-        contact,
-        email,
-        message,
-      ]);
-  
-      const insertedEnquiry = result.rows[0];
-  
-      // Send an email to the user using nodemailer
-      const transporter = nodemailer.createTransport({
-        service: "gmail", // Use your email service
-        auth: {
-          user: process.env.EMAIL_USER, // Your email
-          pass: process.env.EMAIL_PASS, // Your email password
-        },
-      });
-  
-      const mailOptions = {
-        from: process.env.EMAIL_USER, // Sender address
-        to: email, // Recipient's email
-        subject: "Thank you for your enquiry at FAWTRUCK",
-        text: `
+
+    const result = await db.query(query, [
+      name,
+      country,
+      contact,
+      email,
+      message,
+    ]);
+
+    const insertedEnquiry = result.rows[0];
+
+    // Send an email to the user using nodemailer
+    const transporter = nodemailer.createTransport({
+      service: "gmail", // Use your email service
+      auth: {
+        user: process.env.EMAIL_USER, // Your email
+        pass: process.env.EMAIL_PASS, // Your email password
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER, // Sender address
+      to: email, // Recipient's email
+      subject: "Thank you for your enquiry at FAWTRUCK",
+      text: `
           Hi ${name},
           
           Thank you for reaching out to us. We have received your enquiry with the following details:
@@ -62,22 +63,22 @@ app.post("/enquiries", async (req, res) => {
           Best regards,
           FAWTRUCK
         `,
-      };
-  
-      await transporter.sendMail(mailOptions);
-  
-      res.status(201).json({
-        message: "Enquiry added successfully and confirmation email sent.",
-        enquiry: insertedEnquiry,
-      });
-    } catch (err) {
-      console.error("Error adding enquiry or sending email:", err.message);
-      res.status(500).json({ message: "Internal server error." });
-    }
-  });
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(201).json({
+      message: "Enquiry added successfully and confirmation email sent.",
+      enquiry: insertedEnquiry,
+    });
+  } catch (err) {
+    console.error("Error adding enquiry or sending email:", err.message);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
 
 // API to fetch all enquiries
-app.get("/enquiries", async (req, res) => {
+app.get("/enquiries", verifyAdmin, async (req, res) => {
   try {
     const query = "SELECT * FROM enquiries ORDER BY created_at DESC;";
     const result = await db.query(query);
@@ -100,11 +101,9 @@ app.put("/enquiries/:id", async (req, res) => {
 
     // Validate input
     if (!name || !country || !contact || !email || !message) {
-      return res
-        .status(400)
-        .json({
-          message: "Name, country, contact, email, and message are required.",
-        });
+      return res.status(400).json({
+        message: "Name, country, contact, email, and message are required.",
+      });
     }
 
     // SQL query to update the enquiry in the database

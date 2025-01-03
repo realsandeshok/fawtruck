@@ -31,10 +31,10 @@ app.use("/api/admin",  loginRoutes); // Ready
 app.use("/api/admin",  registerRoutes); // Ready
 
 //adminn protected routes
-app.use("/api/admin",verifyAdmin,  bannerRoutes); // Ready
-app.use("/api/admin",verifyAdmin,  aboutRoutes); // Ready
-app.use("/api/admin",verifyAdmin,  truckRoutes); // Ready
-app.use("/api/admin",verifyAdmin,  enquiryRoutes); // Ready
+// app.use("/api/admin",verifyAdmin,  bannerRoutes); // Ready
+// app.use("/api/admin",verifyAdmin,  aboutRoutes); // Ready
+// app.use("/api/admin",verifyAdmin,  truckRoutes); // Ready
+// app.use("/api/admin",verifyAdmin,  enquiryRoutes); // Ready
 
 //web public routes
 app.use("/api",  bannerRoutes); // Ready
