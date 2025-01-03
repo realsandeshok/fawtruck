@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PlusCircle, Edit, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { AdminTruckModels } from '../../api/api';
 
 interface TruckModel {
   id: number;
@@ -25,7 +26,7 @@ const TruckModels = () => {
         return;
       }
       try {
-        const response = await fetch('http://localhost:3000/api/admin/trucks', {
+        const response = await fetch(AdminTruckModels, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -89,8 +90,8 @@ const TruckModels = () => {
 
     try {
       const url = currentModel
-        ? `http://localhost:3000/api/admin/trucks/${currentModel.id}` // Update existing model
-        : 'http://localhost:3000/api/admin/trucks'; // Create new model
+        ? `${AdminTruckModels}/${currentModel.id}` // Update existing model
+        : AdminTruckModels; // Create new model
 
       const method = currentModel ? 'PUT' : 'POST';
 
@@ -105,7 +106,7 @@ const TruckModels = () => {
       if (response.ok) {
         // const updatedBanner = await response.json();
         // Refetch banners to ensure state is updated
-        const data = await fetch('http://localhost:3000/api/admin/trucks', {
+        const data = await fetch(AdminTruckModels, {
           headers: {
             Authorization: `Bearer ${token}`, // Include the token
           },
@@ -134,7 +135,7 @@ const TruckModels = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/api/admin/trucks/${id}`, {
+      const response = await fetch(`${AdminTruckModels}/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`, // Include the token in headers

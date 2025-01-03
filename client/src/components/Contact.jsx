@@ -3,6 +3,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { Facebook, Instagram, Youtube } from "lucide-react";
 import { useInView } from "react-intersection-observer";
+import { Enquiries } from "../api/api";
 
 export default function Contact({ language }) {
   const { ref: leftRef, inView } = useInView({
@@ -35,7 +36,7 @@ export default function Contact({ language }) {
     setResponseMessage("");
 
     try {
-      const response = await fetch("http://localhost:3000/api/enquiries", {
+      const response = await fetch(Enquiries, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -47,7 +48,7 @@ export default function Contact({ language }) {
         toast.success(
           language === "en"
             ? "Your message has been sent successfully!"
-            : "Arabic Successful"
+            : "لقد تم إرسال رسالتك بنجاح!"
         );
         setFormData({
           name: "",

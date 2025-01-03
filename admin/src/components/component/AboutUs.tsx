@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Edit, Save } from "lucide-react";
 import toast from "react-hot-toast";
+import { AdminAboutContent } from "../../api/api";
 
 interface AboutUsContent {
   id: number;
@@ -36,7 +37,7 @@ const AboutUs = () => {
     try {
       // Send the updated content to the backend using PUT request
       const response = await fetch(
-        `http://localhost:3000/api/admin/about/${content.id}`,
+        `${AdminAboutContent}/${content.id}`,
         {
           method: "PUT",
           headers: {
@@ -92,7 +93,7 @@ const AboutUs = () => {
         return;
       }
       try {
-        const response = await fetch("http://localhost:3000/api/admin/about", {
+        const response = await fetch(AdminAboutContent, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

@@ -2,6 +2,7 @@ import { motion, useAnimation } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import MyImage from "../assets/1.png"; // Adjust the path as needed
+import { AboutContent } from "../api/api";
 
 function About({language}) {
   const [aboutData, setAboutData] = useState(null);
@@ -17,7 +18,7 @@ function About({language}) {
   useEffect(() => {
     const fetchAboutData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/about");
+        const response = await fetch(AboutContent);
         const data = await response.json();
         if (data.about && data.about.length > 0) {
           setAboutData(data.about[0]); // Assuming you want the first item

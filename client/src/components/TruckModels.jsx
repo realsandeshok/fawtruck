@@ -1,13 +1,14 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import TruckModelsCarousel from "./TruckModelsCarousel";
+import { TruckModel } from "../api/api";
 
 const TruckModels = ({ language }) => {
   const [truckModels, setTruckModels] = useState([]);
   useEffect(() => {
     const fetchTruckModels = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/trucks");
+        const response = await fetch(TruckModel);
         const data = await response.json();
         if (data.trucks) {
           console.log(data.trucks);

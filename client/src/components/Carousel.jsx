@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion } from "framer-motion";
+import { Banners } from '../api/api';
 
 export function Carousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -12,7 +13,7 @@ export function Carousel() {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/banner');
+        const response = await fetch(Banners);
         const data = await response.json();
         setBanners(data.banners); // Set banners in state
       } catch (error) {

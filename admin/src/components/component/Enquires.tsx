@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Eye } from "lucide-react";
 import toast from "react-hot-toast";
+import { Enquiries } from "../../api/api";
 
 interface Enquiry {
   id: number;
@@ -21,7 +22,7 @@ const Enquires = () => {
   useEffect(() => {
     const fetchEnquiries = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/enquiries");
+        const response = await fetch(Enquiries);
         if (!response.ok) {
           throw new Error("Failed to fetch enquiries");
         }
@@ -108,39 +109,25 @@ const Enquires = () => {
 
       {isDialogOpen && selectedEnquiry && (
         <div
-          className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-gray-800 bg-opacity-85 flex items-center justify-center z-50"
           onClick={closeDialog}
         >
           <div
-            className="bg-white rounded-lg p-6 shadow-lg w-96"
+            className="bg-gray-900 text-white rounded-lg p-6 shadow-lg w-96"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-xl font-bold mb-4">Enquiry Details</h2>
-            <p>
-              <strong>ID:</strong> {selectedEnquiry.id}
-            </p>
-            <p>
-              <strong>Name:</strong> {selectedEnquiry.name}
-            </p>
-            <p>
-              <strong>Country:</strong> {selectedEnquiry.country}
-            </p>
-            <p>
-              <strong>Contact:</strong> {selectedEnquiry.contact}
-            </p>
-            <p>
-              <strong>Email:</strong> {selectedEnquiry.email}
-            </p>
-            <p>
-              <strong>Message:</strong> {selectedEnquiry.message}
-            </p>
-            <p>
-              <strong>Date:</strong> {formatDate(selectedEnquiry.created_at)}
-            </p>
+            <h2 className="text-xl font-bold text-yellow-400 mb-4">Enquiry Details</h2>
+            <p><strong>ID:</strong> {selectedEnquiry.id}</p>
+            <p><strong>Name:</strong> {selectedEnquiry.name}</p>
+            <p><strong>Country:</strong> {selectedEnquiry.country}</p>
+            <p><strong>Contact:</strong> {selectedEnquiry.contact}</p>
+            <p><strong>Email:</strong> {selectedEnquiry.email}</p>
+            <p><strong>Message:</strong> {selectedEnquiry.message}</p>
+            <p><strong>Date:</strong> {formatDate(selectedEnquiry.created_at)}</p>
             <div className="mt-4 text-right">
               <button
                 onClick={closeDialog}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+                className="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-lg transition"
               >
                 Close
               </button>
@@ -148,6 +135,7 @@ const Enquires = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };

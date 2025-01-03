@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Slider from "react-slick";
+import { TruckModel } from "../api/api";
 
 export default function TruckModelsCarousel({ language }) {
   const [truckModels, setTruckModels] = useState([]);
@@ -8,7 +9,7 @@ export default function TruckModelsCarousel({ language }) {
   useEffect(() => {
     const fetchTruckModels = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/trucks");
+        const response = await fetch(TruckModel);
         const data = await response.json();
         if (data.trucks) {
           console.log(data.trucks);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PlusCircle, Edit, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { AdminBanners, AdminUploadBanners } from '../../api/api';
 
 interface Banner {
   id: number;
@@ -86,8 +87,8 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
   try {
     const url = currentBanner
-      ? `http://localhost:3000/api/admin/banner/${currentBanner.id}` // Update existing banner
-      : 'http://localhost:3000/api/admin/upload-banner'; // Create new banner
+      ? `${AdminBanners}/${currentBanner.id}` // Update existing banner
+      : AdminUploadBanners; // Create new banner
 
     const method = currentBanner ? 'PUT' : 'POST';
 
@@ -100,7 +101,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     });
 
     if (response.ok) {
-      const bannersResponse = await fetch('http://localhost:3000/api/admin/banner', {
+      const bannersResponse = await fetch(AdminBanners, {
         headers: {
           Authorization: `Bearer ${token}`, // Include the token in headers
         },
@@ -132,7 +133,7 @@ const handleDelete = async (id: number) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/api/admin/banner/${id}`, {
+      const response = await fetch(`${AdminBanners}/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`, // Include the token in headers
