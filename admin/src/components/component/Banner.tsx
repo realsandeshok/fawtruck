@@ -37,7 +37,6 @@ const Banner = () => {
         if (response.ok) {
           const data = await response.json();
           setBanners(data.banners); // Assuming the response contains a "banners" array
-          toast.success('Banners fetched successfully!'); // Success toast
         } else {
           const errorText = await response.text();
           console.error(`Error fetching banners: ${response.status}`, errorText);

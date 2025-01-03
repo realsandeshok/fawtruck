@@ -115,7 +115,6 @@ const AboutUs = () => {
             description_ar: latestContent.description_ar,
             // imageUrl: latestContent.imageUrl || '/placeholder.svg', /// Set a default image if not provided
           });
-          toast.success("Content loaded successfully!");
         } else {
           toast.error("No content available to display.");
         }

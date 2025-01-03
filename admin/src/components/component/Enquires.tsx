@@ -31,7 +31,6 @@ const Enquires = () => {
 
         if (data && Array.isArray(data.enquiries)) {
           setEnquiries(data.enquiries);
-          toast.success("Enquiries fetched successfully");
         } else {
           console.error("Fetched data is not in the expected format:", data);
           setEnquiries([]);

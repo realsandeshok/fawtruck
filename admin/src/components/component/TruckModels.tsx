@@ -35,7 +35,6 @@ const TruckModels = () => {
 
         if (response.ok && data.trucks) {
           setTruckModels(data.trucks);
-          toast.success('Truck models fetched successfully!'); // Success toast
         } else {
           toast.error('Failed to fetch truck models.');
         }
