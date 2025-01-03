@@ -21,8 +21,17 @@ const Enquires = () => {
 
   useEffect(() => {
     const fetchEnquiries = async () => {
+      const token = localStorage.getItem("token"); // Get the token from localStorage
+      if (!token) {
+        toast.error("Session expired. Please log in again.");
+        return;
+      }
       try {
-        const response = await fetch(Enquiries);
+        const response = await fetch(Enquiries, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch enquiries");
         }
@@ -57,7 +66,11 @@ const Enquires = () => {
   };
 
   const formatDate = (date: string) => {
-    const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "long", day: "numeric" };
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
     return new Date(date).toLocaleDateString(undefined, options);
   };
 
@@ -90,7 +103,9 @@ const Enquires = () => {
                   <td className="px-4 py-2">{enquiry.contact}</td>
                   <td className="px-4 py-2">{enquiry.email}</td>
                   <td className="px-4 py-2">{enquiry.message}</td>
-                  <td className="px-4 py-2">{formatDate(enquiry.created_at)}</td>
+                  <td className="px-4 py-2">
+                    {formatDate(enquiry.created_at)}
+                  </td>
                   <td className="px-4 py-2">
                     <button
                       onClick={() => openDialog(enquiry)}
@@ -115,14 +130,30 @@ const Enquires = () => {
             className="bg-gray-900 text-white rounded-lg p-6 shadow-lg w-96"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-xl font-bold text-yellow-400 mb-4">Enquiry Details</h2>
-            <p><strong>ID:</strong> {selectedEnquiry.id}</p>
-            <p><strong>Name:</strong> {selectedEnquiry.name}</p>
-            <p><strong>Country:</strong> {selectedEnquiry.country}</p>
-            <p><strong>Contact:</strong> {selectedEnquiry.contact}</p>
-            <p><strong>Email:</strong> {selectedEnquiry.email}</p>
-            <p><strong>Message:</strong> {selectedEnquiry.message}</p>
-            <p><strong>Date:</strong> {formatDate(selectedEnquiry.created_at)}</p>
+            <h2 className="text-xl font-bold text-yellow-400 mb-4">
+              Enquiry Details
+            </h2>
+            <p>
+              <strong>ID:</strong> {selectedEnquiry.id}
+            </p>
+            <p>
+              <strong>Name:</strong> {selectedEnquiry.name}
+            </p>
+            <p>
+              <strong>Country:</strong> {selectedEnquiry.country}
+            </p>
+            <p>
+              <strong>Contact:</strong> {selectedEnquiry.contact}
+            </p>
+            <p>
+              <strong>Email:</strong> {selectedEnquiry.email}
+            </p>
+            <p>
+              <strong>Message:</strong> {selectedEnquiry.message}
+            </p>
+            <p>
+              <strong>Date:</strong> {formatDate(selectedEnquiry.created_at)}
+            </p>
             <div className="mt-4 text-right">
               <button
                 onClick={closeDialog}
@@ -134,7 +165,6 @@ const Enquires = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };

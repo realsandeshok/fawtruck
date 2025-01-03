@@ -86,18 +86,20 @@ const AboutUs = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem("token"); // Retrieve token from local storage
-      if (!token) {
-        console.error("Token not found. User might need to log in.");
-        toast.error("Session expired. Please log in again.");
-        return;
-      }
+      // const token = localStorage.getItem("token"); // Retrieve token from local storage
+      // if (!token) {
+      //   console.error("Token not found. User might need to log in.");
+      //   toast.error("Session expired. Please log in again.");
+      //   return;
+      // }
       try {
-        const response = await fetch(AdminAboutContent, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetch(AdminAboutContent
+        //    {
+        //   headers: {
+        //     Authorization: `Bearer ${token}`,
+        //   },
+        // }
+      );
         const data = await response.json();
 
         if (
