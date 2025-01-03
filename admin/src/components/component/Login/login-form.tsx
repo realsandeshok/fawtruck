@@ -5,6 +5,7 @@ import { Card, CardContent } from "../../ui/card"
 import { Input } from "../../ui/input"
 import { Label } from "../../ui/label"
 import toast from "react-hot-toast" // Import toast
+import { AdminLogin } from "../../../api/api"
 
 export function LoginForm({
   className,
@@ -20,7 +21,7 @@ export function LoginForm({
     const userData = { username, password };
   
     try {
-      const response = await fetch("http://localhost:3000/api/admin/login", {
+      const response = await fetch(AdminLogin, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
