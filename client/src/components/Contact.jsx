@@ -1,5 +1,6 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import toast from "react-hot-toast";
 import { Facebook, Instagram, Youtube } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 
@@ -17,8 +18,9 @@ export default function Contact({ language }) {
 
   const [formData, setFormData] = useState({
     name: "",
-    country: "",
+    country: "saudi-arabia",
     contact: "",
+    email: "",
     message: "",
   });
 
@@ -40,20 +42,33 @@ export default function Contact({ language }) {
         },
         body: JSON.stringify(formData),
       });
-
+      // console.log(error);
       if (response.ok) {
-        setResponseMessage("Your message has been sent successfully!");
+        toast.success(
+          language === "en"
+            ? "Your message has been sent successfully!"
+            : "Arabic Successful"
+        );
         setFormData({
           name: "",
           country: "",
           contact: "",
+          email: "",
           message: "",
         });
       } else {
-        setResponseMessage("Failed to send your message. Please try again.");
+        toast.error(
+          language === "en"
+            ? "Failed to send your message. Please try again."
+            : "Arabic Error"
+        );
       }
     } catch (error) {
-      setResponseMessage("An error occurred. Please try again later.");
+      toast.error(
+        language === "en"
+          ? "An error occurred. Please try again later."
+          : "Arabic Server Error"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -84,6 +99,7 @@ export default function Contact({ language }) {
               </p>
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <input
+                  required
                   type="text"
                   name="name"
                   value={formData.name}
@@ -92,6 +108,7 @@ export default function Contact({ language }) {
                   className="w-full border-b border-gray-300 focus:border-blue-500 focus:outline-none px-4 py-2"
                 />
                 <select
+                  required
                   name="country"
                   value={formData.country}
                   onChange={handleChange}
@@ -104,11 +121,24 @@ export default function Contact({ language }) {
                 <div className="flex items-center gap-2">
                   {/* <span className="text-xl">🇸🇦</span> */}
                   <input
+                    required
                     name="contact"
                     value={formData.contact}
                     onChange={handleChange}
-                    type="tel"
+                    type="number"
                     placeholder="+966 55 280 3657"
+                    className="w-full border-b border-gray-300 focus:border-blue-500 focus:outline-none px-4 py-2"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  {/* <span className="text-xl">🇸🇦</span> */}
+                  <input
+                    required
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    type="email"
+                    placeholder="xyz@gmail.com"
                     className="w-full border-b border-gray-300 focus:border-blue-500 focus:outline-none px-4 py-2"
                   />
                 </div>
@@ -298,6 +328,7 @@ export default function Contact({ language }) {
                 سيساعدك خبراؤنا في اختيار وسائل النقل وتقديم النصائح حول القضايا
                 ذات الاهتمام.
               </p>
+
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <input
                   name="name"
@@ -325,6 +356,18 @@ export default function Contact({ language }) {
                     onChange={handleChange}
                     type="tel"
                     placeholder="+966 55 280 3657"
+                    className="w-full text-right border-b border-gray-300 focus:border-blue-500 focus:outline-none px-4 py-2"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  {/* <span className="text-xl">🇸🇦</span> */}
+                  <input
+                    required
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    type="email"
+                    placeholder="xyz@gmail.com"
                     className="w-full text-right border-b border-gray-300 focus:border-blue-500 focus:outline-none px-4 py-2"
                   />
                 </div>
