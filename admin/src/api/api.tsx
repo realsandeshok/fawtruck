@@ -1,6 +1,6 @@
 // api.tsx
 
-const BASE_URL = "http://134.209.118.179:2001";
+const BASE_URL = "https://fawtruck.onrender.com";
 
 // Define API endpoints for admin
 const AdminLogin = `${BASE_URL}/api/admin/login`;
