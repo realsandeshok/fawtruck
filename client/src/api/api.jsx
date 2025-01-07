@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "https://fawtruck.onrender.com";
 
 const Banners = `${BASE_URL}/api/banner`;
 const TruckModel = `${BASE_URL}/api/trucks`;
