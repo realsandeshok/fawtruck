@@ -77,97 +77,100 @@ const Enquires = () => {
 
   return (
     <Layout>
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Enquiries</h1>
-      {enquiries.length === 0 ? (
-        <p className="text-gray-500">No enquiries available.</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white shadow-md rounded-lg">
-            <thead>
-              <tr className="bg-gray-200 text-gray-700">
-                {/* <th className="px-4 py-2 text-left">ID</th> */}
-                <th className="px-4 py-2 text-left">Name</th>
-                <th className="px-4 py-2 text-left">Country</th>
-                <th className="px-4 py-2 text-left">Contact</th>
-                <th className="px-4 py-2 text-left">Email</th>
-                <th className="px-4 py-2 text-left">Message</th>
-                <th className="px-4 py-2 text-left">Date</th>
-                <th className="px-4 py-2 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {enquiries.map((enquiry) => (
-                <tr key={enquiry.id} className="border-t hover:bg-gray-100">
-                  {/* <td className="px-4 py-2">{enquiry.id}</td> */}
-                  <td className="px-4 py-2">{enquiry.name}</td>
-                  <td className="px-4 py-2">{enquiry.country}</td>
-                  <td className="px-4 py-2">{enquiry.contact}</td>
-                  <td className="px-4 py-2">{enquiry.email}</td>
-                  <td className="px-4 py-2">{enquiry.message}</td>
-                  <td className="px-4 py-2">
-                    {formatDate(enquiry.created_at)}
-                  </td>
-                  <td className="px-4 py-2">
-                    <button
-                      onClick={() => openDialog(enquiry)}
-                      className="text-blue-500 hover:text-blue-700"
-                    >
-                      <Eye size={20} />
-                    </button>
-                  </td>
+      <div className="p-6">
+        <h1 className="text-2xl font-bold mb-4">Enquiries</h1>
+        {enquiries.length === 0 ? (
+          <tr>
+            <td colSpan={3} className="text-center py-4">
+              No enquiries found.
+            </td>
+          </tr>) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white shadow-md rounded-lg">
+              <thead>
+                <tr className="bg-gray-200 text-gray-700">
+                  {/* <th className="px-4 py-2 text-left">ID</th> */}
+                  <th className="px-4 py-2 text-left">Name</th>
+                  <th className="px-4 py-2 text-left">Country</th>
+                  <th className="px-4 py-2 text-left">Contact</th>
+                  <th className="px-4 py-2 text-left">Email</th>
+                  <th className="px-4 py-2 text-left">Message</th>
+                  <th className="px-4 py-2 text-left">Date</th>
+                  <th className="px-4 py-2 text-left">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody>
+                {enquiries.map((enquiry) => (
+                  <tr key={enquiry.id} className="border-t hover:bg-gray-100">
+                    {/* <td className="px-4 py-2">{enquiry.id}</td> */}
+                    <td className="px-4 py-2">{enquiry.name}</td>
+                    <td className="px-4 py-2">{enquiry.country}</td>
+                    <td className="px-4 py-2">{enquiry.contact}</td>
+                    <td className="px-4 py-2">{enquiry.email}</td>
+                    <td className="px-4 py-2">{enquiry.message}</td>
+                    <td className="px-4 py-2">
+                      {formatDate(enquiry.created_at)}
+                    </td>
+                    <td className="px-4 py-2">
+                      <button
+                        onClick={() => openDialog(enquiry)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        <Eye size={20} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-      {isDialogOpen && selectedEnquiry && (
-        <div
-          className="fixed inset-0 bg-gray-800 bg-opacity-85 flex items-center justify-center z-50"
-          onClick={closeDialog}
-        >
+        {isDialogOpen && selectedEnquiry && (
           <div
-            className="bg-gray-900 text-white rounded-lg p-6 shadow-lg w-96"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 bg-gray-800 bg-opacity-85 flex items-center justify-center z-50"
+            onClick={closeDialog}
           >
-            <h2 className="text-xl font-bold text-yellow-400 mb-4">
-              Enquiry Details
-            </h2>
-            <p>
-              <strong>ID:</strong> {selectedEnquiry.id}
-            </p>
-            <p>
-              <strong>Name:</strong> {selectedEnquiry.name}
-            </p>
-            <p>
-              <strong>Country:</strong> {selectedEnquiry.country}
-            </p>
-            <p>
-              <strong>Contact:</strong> {selectedEnquiry.contact}
-            </p>
-            <p>
-              <strong>Email:</strong> {selectedEnquiry.email}
-            </p>
-            <p>
-              <strong>Message:</strong> {selectedEnquiry.message}
-            </p>
-            <p>
-              <strong>Date:</strong> {formatDate(selectedEnquiry.created_at)}
-            </p>
-            <div className="mt-4 text-right">
-              <button
-                onClick={closeDialog}
-                className="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-lg transition"
-              >
-                Close
-              </button>
+            <div
+              className="bg-gray-900 text-white rounded-lg p-6 shadow-lg w-96"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-xl font-bold text-yellow-400 mb-4">
+                Enquiry Details
+              </h2>
+              <p>
+                <strong>ID:</strong> {selectedEnquiry.id}
+              </p>
+              <p>
+                <strong>Name:</strong> {selectedEnquiry.name}
+              </p>
+              <p>
+                <strong>Country:</strong> {selectedEnquiry.country}
+              </p>
+              <p>
+                <strong>Contact:</strong> {selectedEnquiry.contact}
+              </p>
+              <p>
+                <strong>Email:</strong> {selectedEnquiry.email}
+              </p>
+              <p>
+                <strong>Message:</strong> {selectedEnquiry.message}
+              </p>
+              <p>
+                <strong>Date:</strong> {formatDate(selectedEnquiry.created_at)}
+              </p>
+              <div className="mt-4 text-right">
+                <button
+                  onClick={closeDialog}
+                  className="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-lg transition"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
     </Layout>
   );
 };

@@ -186,7 +186,15 @@ const TruckModels = () => {
             </tr>
           </thead>
           <tbody>
-            {truckModels.map((model) => (
+            
+            {truckModels.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="text-center py-4">
+                  No truck-models found.
+                </td>
+              </tr>
+            ) : (
+            truckModels.map((model) => (
               <tr key={model.id}>
                 <td className="px-6 py-4 border-b">{model.truck_name}</td>
                 <td className="px-6 py-4 border-b">{model.truck_name_ar}</td>
@@ -202,7 +210,8 @@ const TruckModels = () => {
                   </button>
                 </td>
               </tr>
-            ))}
+            )))
+          }
           </tbody>
         </table>
       </div>
