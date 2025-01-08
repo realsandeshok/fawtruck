@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, BrowserRouter } from "react-router-dom";
 import LoginPage from "./components/component/Login/page";
 import { Toaster } from "react-hot-toast";
 import { useEffect, useState } from "react";
@@ -39,6 +39,7 @@ function PrivateRoute({ children }: { children: JSX.Element }) {
 
 function AppRoutes() {
   return (
+    <BrowserRouter>
     <Routes>
       <Route path="/" element={<LoginPage />} />
       <Route
@@ -75,6 +76,7 @@ function AppRoutes() {
       />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
+    </BrowserRouter>
   );
 }
 
@@ -82,9 +84,9 @@ function App() {
   return (
     <>
       <Toaster />
-      <Router>
+      <BrowserRouter>
         <AppRoutes />
-      </Router>
+      </BrowserRouter>
     </>
   );
 }
