@@ -39,7 +39,6 @@ function PrivateRoute({ children }: { children: JSX.Element }) {
 
 function AppRoutes() {
   return (
-    <BrowserRouter>
     <Routes>
       <Route path="/" element={<LoginPage />} />
       <Route
@@ -76,7 +75,6 @@ function AppRoutes() {
       />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
-    </BrowserRouter>
   );
 }
 
