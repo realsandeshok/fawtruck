@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Eye } from "lucide-react";
 import toast from "react-hot-toast";
 import { Enquiries } from "../../api/api";
+import Layout from "./Layout";
 
 interface Enquiry {
   id: number;
@@ -75,6 +76,7 @@ const Enquires = () => {
   };
 
   return (
+    <Layout>
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Enquiries</h1>
       {enquiries.length === 0 ? (
@@ -166,6 +168,7 @@ const Enquires = () => {
         </div>
       )}
     </div>
+    </Layout>
   );
 };
 

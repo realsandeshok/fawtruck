@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PlusCircle, Edit, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { AdminTruckModels } from '../../api/api';
+import Layout from './Layout';
 
 interface TruckModel {
   id: number;
@@ -161,6 +162,7 @@ const TruckModels = () => {
 
 
   return (
+    <Layout>
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Truck Models</h1>
@@ -255,6 +257,7 @@ const TruckModels = () => {
         </div>
       )}
     </div>
+    </Layout>
   );
 };
 

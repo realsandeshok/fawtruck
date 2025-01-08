@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PlusCircle, Edit, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { AdminBanners, AdminUploadBanners } from '../../api/api';
+import Layout from './Layout';
 
 interface Banner {
   id: number;
@@ -156,6 +157,7 @@ const handleDelete = async (id: number) => {
 
 
   return (
+    <Layout>
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Banners</h1>
@@ -258,6 +260,7 @@ const handleDelete = async (id: number) => {
         </div>
       )}
     </div>
+    </Layout>
   );
 };
 

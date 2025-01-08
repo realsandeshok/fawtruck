@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Edit, Save } from "lucide-react";
 import toast from "react-hot-toast";
 import { AdminAboutContent } from "../../api/api";
+import Layout from "./Layout";
 
 interface AboutUsContent {
   id: number;
@@ -130,6 +131,7 @@ const AboutUs = () => {
   }, []); // Runs once on component mount
 
   return (
+    <Layout>
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">About Us</h1>
@@ -274,6 +276,7 @@ const AboutUs = () => {
         )}
       </div>
     </div>
+    </Layout>
   );
 };
 
