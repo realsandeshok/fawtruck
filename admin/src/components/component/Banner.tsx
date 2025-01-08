@@ -125,36 +125,63 @@ const Banner = () => {
 
   // Handle banner deletion
   const handleDelete = async (id: number) => {
-    if (confirm('Are you sure you want to delete this banner?')) {
-      const token = localStorage.getItem('token'); // Get the token from localStorage
-      if (!token) {
-        toast.error('Session expired. Please log in again.');
-        return;
+    // Show the confirmation toast
+    const confirmToastId = toast(
+      (t) => (
+        <div>
+          <p>Are you sure you want to delete this banner?</p>
+          <div className="mt-2 flex justify-end gap-2">
+            <button
+              onClick={() => {
+                toast.dismiss(t.id); // Dismiss the confirmation toast
+                proceedWithDeletion(id); // Proceed with deletion
+              }}
+              className="bg-red-500 text-white px-3 py-1 rounded"
+            >
+              Yes
+            </button>
+            <button
+              onClick={() => toast.dismiss(t.id)} // Dismiss the confirmation toast
+              className="bg-gray-300 px-3 py-1 rounded"
+            >
+              No
+            </button>
+          </div>
+        </div>
+      ),
+      { duration: 5000 } // The confirmation toast will last for 5 seconds
+    );
+  };
+  
+  // Function to actually delete the banner
+  const proceedWithDeletion = async (id: number) => {
+    const token = localStorage.getItem('token'); // Get the token from localStorage
+    if (!token) {
+      toast.error('Session expired. Please log in again.');
+      return;
+    }
+  
+    try {
+      const response = await fetch(`${AdminBanners}/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`, // Include the token in headers
+        },
+      });
+  
+      if (response.ok) {
+        setBanners((prevBanners) => prevBanners.filter((banner) => banner.id !== id));
+        toast.success('Banner deleted successfully!');
+      } else {
+        const error = await response.json();
+        console.error('Error response:', error);
+        toast.error('Failed to delete banner.');
       }
-
-      try {
-        const response = await fetch(`${AdminBanners}/${id}`, {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`, // Include the token in headers
-          },
-        });
-
-        if (response.ok) {
-          setBanners(banners.filter((banner) => banner.id !== id));
-          toast.success('Banner deleted successfully!');
-        } else {
-          const error = await response.json();
-          console.error('Error response:', error);
-          toast.error('Failed to delete banner.');
-        }
-      } catch (error) {
-        console.error('Error deleting banner:', error);
-        toast.error('Error occurred while deleting banner.');
-      }
+    } catch (error) {
+      console.error('Error deleting banner:', error);
+      toast.error('Error occurred while deleting banner.');
     }
   };
-
 
   return (
     <Layout>
@@ -174,7 +201,7 @@ const Banner = () => {
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-300">
             <thead>
-              <tr>
+              <tr className="bg-gray-200 text-gray-700">
                 <th className="px-6 py-3 border-b text-start">Title</th>
                 {/* <th className="px-6 py-3 border-b">Description</th> */}
                 <th className="px-6 py-3 border-b text-start">Image</th>
@@ -184,7 +211,7 @@ const Banner = () => {
             <tbody>
               {banners.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="text-center py-4">
+                  <td colSpan={3} className="text-center py-4 h-[75vh]">
                     No banners found.
                   </td>
                 </tr>
@@ -211,7 +238,7 @@ const Banner = () => {
 
           </table>
         </div>
-      
+
 
         {isModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">

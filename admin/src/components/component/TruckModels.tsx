@@ -54,7 +54,7 @@ const TruckModels = () => {
       toast.error('You can only add up to 5 truck models.');
       return;
     }
-  
+
     setCurrentModel(model);
     setIsModalOpen(true);
     setSelectedFile(null); // Clear selected file when opening modal
@@ -126,14 +126,45 @@ const TruckModels = () => {
   };
 
 
- const handleDelete = async (id: number) => {
-  if (confirm('Are you sure you want to delete this truck model?')) {
+
+
+  const handleDelete = async (id: number) => {
+    // Show the confirmation toast
+    const confirmToastId = toast(
+      (t) => (
+        <div>
+          <p>Are you sure you want to delete this truck model?</p>
+          <div className="mt-2 flex justify-end gap-2">
+            <button
+              onClick={() => {
+                toast.dismiss(t.id); // Dismiss the confirmation toast
+                proceedWithDeletion(id); // Proceed with deletion
+              }}
+              className="bg-red-500 text-white px-3 py-1 rounded"
+            >
+              Yes
+            </button>
+            <button
+              onClick={() => toast.dismiss(t.id)} // Dismiss the confirmation toast
+              className="bg-gray-300 px-3 py-1 rounded"
+            >
+              No
+            </button>
+          </div>
+        </div>
+      ),
+      { duration: 5000 } // The confirmation toast will last for 5 seconds
+    );
+  };
+  
+  // Function to actually delete the truck model
+  const proceedWithDeletion = async (id: number) => {
     const token = localStorage.getItem('token'); // Get the token from localStorage
     if (!token) {
       toast.error('Session expired. Please log in again.');
       return;
     }
-
+  
     try {
       const response = await fetch(`${AdminTruckModels}/${id}`, {
         method: 'DELETE',
@@ -141,12 +172,13 @@ const TruckModels = () => {
           Authorization: `Bearer ${token}`, // Include the token in headers
         },
       });
-
+  
       if (response.ok) {
         // Remove the deleted truck model from state
         setTruckModels((prevTruckModels) =>
           prevTruckModels.filter((model) => model.id !== id)
         );
+        toast.success('Truck model deleted successfully.');
       } else {
         const error = await response.json();
         console.error('Error response:', error);
@@ -156,116 +188,117 @@ const TruckModels = () => {
       console.error('Error deleting truck model:', error);
       toast.error('Error deleting truck model.');
     }
-  }
-};
+  };
+  
+
 
 
 
   return (
     <Layout>
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Truck Models</h1>
-        <button
-          onClick={() => openModal()}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center"
-        >
-          <PlusCircle className="mr-2" size={20} />
-          Add Truck Model
-        </button>
-      </div>
-
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-300">
-          <thead>
-            <tr>
-              <th className="px-6 py-3 border-b text-start">Name (English)</th>
-              <th className="px-6 py-3 border-b text-start">Name (Arabic)</th>
-              <th className="px-6 py-3 border-b text-start">Image</th>
-              <th className="px-6 py-3 border-b text-start">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            
-            {truckModels.length === 0 ? (
-              <tr>
-                <td colSpan={3} className="text-center py-4">
-                  No truck-models found.
-                </td>
-              </tr>
-            ) : (
-            truckModels.map((model) => (
-              <tr key={model.id}>
-                <td className="px-6 py-4 border-b">{model.truck_name}</td>
-                <td className="px-6 py-4 border-b">{model.truck_name_ar}</td>
-                <td className="px-6 py-4 border-b">
-                  <img src={model.image_url} alt={model.truck_name} className="w-20 h-20 object-cover" />
-                </td>
-                <td className="px-6 py-4 border-b">
-                  <button onClick={() => openModal(model)} className="text-blue-500 hover:text-blue-600 mr-2">
-                    <Edit size={20} />
-                  </button>
-                  <button onClick={() => handleDelete(model.id)} className="text-red-500 hover:text-red-600">
-                    <Trash2 size={20} />
-                  </button>
-                </td>
-              </tr>
-            )))
-          }
-          </tbody>
-        </table>
-      </div>
-
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg w-96">
-            <h2 className="text-xl font-bold mb-4">{currentModel ? 'Edit Truck Model' : 'Add Truck Model'}</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label htmlFor="name" className="block mb-1">Name (English)</label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  className="w-full border rounded-md px-3 py-2"
-                  defaultValue={currentModel?.truck_name || ''}
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="name_ar" className="block mb-1">Name (Arabic)</label>
-                <input
-                  type="text"
-                  id="name_ar"
-                  name="name_ar"
-                  className="w-full border rounded-md px-3 py-2"
-                  defaultValue={currentModel?.truck_name_ar || ''}
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="imageUrl" className="block mb-1">Image</label>
-                <input
-                  type="file"
-                  id="imageUrl"
-                  name="image"
-                  className="w-full border rounded-md px-3 py-2"
-                  onChange={handleFileChange}
-                />
-              </div>
-              <div className="flex justify-end">
-                <button type="button" onClick={closeModal} className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md mr-2">
-                  Cancel
-                </button>
-                <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">
-                  {currentModel ? 'Update' : 'Create'}
-                </button>
-              </div>
-            </form>
-          </div>
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Truck Models</h1>
+          <button
+            onClick={() => openModal()}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center"
+          >
+            <PlusCircle className="mr-2" size={20} />
+            Add Truck Model
+          </button>
         </div>
-      )}
-    </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-300">
+            <thead>
+              <tr className="bg-gray-200 text-gray-700">
+                <th className="px-6 py-3 border-b text-start">Name (English)</th>
+                <th className="px-6 py-3 border-b text-start">Name (Arabic)</th>
+                <th className="px-6 py-3 border-b text-start">Image</th>
+                <th className="px-6 py-3 border-b text-start">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              {truckModels.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="text-center py-4 h-[75vh]">
+                    No truck-models found.
+                  </td>
+                </tr>
+              ) : (
+                truckModels.map((model) => (
+                  <tr key={model.id}>
+                    <td className="px-6 py-4 border-b">{model.truck_name}</td>
+                    <td className="px-6 py-4 border-b">{model.truck_name_ar}</td>
+                    <td className="px-6 py-4 border-b">
+                      <img src={model.image_url} alt={model.truck_name} className="w-20 h-20 object-cover" />
+                    </td>
+                    <td className="px-6 py-4 border-b">
+                      <button onClick={() => openModal(model)} className="text-blue-500 hover:text-blue-600 mr-2">
+                        <Edit size={20} />
+                      </button>
+                      <button onClick={() => handleDelete(model.id)} className="text-red-500 hover:text-red-600">
+                        <Trash2 size={20} />
+                      </button>
+                    </td>
+                  </tr>
+                )))
+              }
+            </tbody>
+          </table>
+        </div>
+
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-6 rounded-lg w-96">
+              <h2 className="text-xl font-bold mb-4">{currentModel ? 'Edit Truck Model' : 'Add Truck Model'}</h2>
+              <form onSubmit={handleSubmit}>
+                <div className="mb-4">
+                  <label htmlFor="name" className="block mb-1">Name (English)</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    className="w-full border rounded-md px-3 py-2"
+                    defaultValue={currentModel?.truck_name || ''}
+                    required
+                  />
+                </div>
+                <div className="mb-4">
+                  <label htmlFor="name_ar" className="block mb-1">Name (Arabic)</label>
+                  <input
+                    type="text"
+                    id="name_ar"
+                    name="name_ar"
+                    className="w-full border rounded-md px-3 py-2"
+                    defaultValue={currentModel?.truck_name_ar || ''}
+                    required
+                  />
+                </div>
+                <div className="mb-4">
+                  <label htmlFor="imageUrl" className="block mb-1">Image</label>
+                  <input
+                    type="file"
+                    id="imageUrl"
+                    name="image"
+                    className="w-full border rounded-md px-3 py-2"
+                    onChange={handleFileChange}
+                  />
+                </div>
+                <div className="flex justify-end">
+                  <button type="button" onClick={closeModal} className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md mr-2">
+                    Cancel
+                  </button>
+                  <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">
+                    {currentModel ? 'Update' : 'Create'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
     </Layout>
   );
 };

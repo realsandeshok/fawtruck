@@ -79,28 +79,30 @@ const Enquires = () => {
     <Layout>
       <div className="p-6">
         <h1 className="text-2xl font-bold mb-4">Enquiries</h1>
-        {enquiries.length === 0 ? (
-          <tr>
-            <td colSpan={3} className="text-center py-4">
-              No enquiries found.
-            </td>
-          </tr>) : (
+       
           <div className="overflow-x-auto">
-            <table className="min-w-full bg-white shadow-md rounded-lg">
+          <table className="min-w-full bg-white border border-gray-300">
               <thead>
                 <tr className="bg-gray-200 text-gray-700">
                   {/* <th className="px-4 py-2 text-left">ID</th> */}
-                  <th className="px-4 py-2 text-left">Name</th>
-                  <th className="px-4 py-2 text-left">Country</th>
-                  <th className="px-4 py-2 text-left">Contact</th>
-                  <th className="px-4 py-2 text-left">Email</th>
-                  <th className="px-4 py-2 text-left">Message</th>
-                  <th className="px-4 py-2 text-left">Date</th>
-                  <th className="px-4 py-2 text-left">Actions</th>
+                  <th className="px-6 py-3 text-left">Name</th>
+                  <th className="px-6 py-3 text-left">Country</th>
+                  <th className="px-6 py-3 text-left">Contact</th>
+                  <th className="px-6 py-3 text-left">Email</th>
+                  <th className="px-6 py-3 text-left">Message</th>
+                  <th className="px-6 py-3 text-left">Date</th>
+                  <th className="px-6 py-3 text-left">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {enquiries.map((enquiry) => (
+
+                {enquiries.length === 0 ? (
+          <tr>
+            <td colSpan={8} className="text-center py-4 h-[75vh]">
+              No enquiries found.
+            </td>
+          </tr>) : (
+                enquiries.map((enquiry) => (
                   <tr key={enquiry.id} className="border-t hover:bg-gray-100">
                     {/* <td className="px-4 py-2">{enquiry.id}</td> */}
                     <td className="px-4 py-2">{enquiry.name}</td>
@@ -120,11 +122,11 @@ const Enquires = () => {
                       </button>
                     </td>
                   </tr>
-                ))}
+                )))}
               </tbody>
             </table>
           </div>
-        )}
+        
 
         {isDialogOpen && selectedEnquiry && (
           <div
@@ -132,37 +134,37 @@ const Enquires = () => {
             onClick={closeDialog}
           >
             <div
-              className="bg-gray-900 text-white rounded-lg p-6 shadow-lg w-96"
+              className="bg-white text-white rounded-lg p-6 shadow-lg w-96"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-xl font-bold text-yellow-400 mb-4">
+              <h2 className="text-xl font-bold text-blue-600 mb-4">
                 Enquiry Details
               </h2>
-              <p>
+              <p className="text-black">
                 <strong>ID:</strong> {selectedEnquiry.id}
               </p>
-              <p>
+              <p className="text-black">
                 <strong>Name:</strong> {selectedEnquiry.name}
               </p>
-              <p>
+              <p className="text-black">
                 <strong>Country:</strong> {selectedEnquiry.country}
               </p>
-              <p>
+              <p className="text-black">
                 <strong>Contact:</strong> {selectedEnquiry.contact}
               </p>
-              <p>
+              <p className="text-black">
                 <strong>Email:</strong> {selectedEnquiry.email}
               </p>
-              <p>
+              <p className="text-black">
                 <strong>Message:</strong> {selectedEnquiry.message}
               </p>
-              <p>
+              <p className="text-black">
                 <strong>Date:</strong> {formatDate(selectedEnquiry.created_at)}
               </p>
               <div className="mt-4 text-right">
                 <button
                   onClick={closeDialog}
-                  className="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-lg transition"
+                  className="bg-blue-400 hover:bg-blue-500 text-black px-4 py-2 rounded-lg transition"
                 >
                   Close
                 </button>
