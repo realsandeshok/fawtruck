@@ -57,7 +57,7 @@ function About({language}) {
         <div>
           <section
             id="About"
-            className="py-40 bg-gray-100 relative bg-fixed bg-cover bg-center"
+            className="py-[5rem] bg-gray-100 relative bg-fixed bg-cover bg-center"
             style={{
               backgroundImage: `url('https://s3-alpha-sig.figma.com/img/dc56/57b7/b07aed81b1591546102e48ee2f630480?Expires=1734307200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=hue1hbySbfv6EL3jinz~vpMemW8ZuMr9Leo4aqRM~j0-rLiOG7D-DGtXGCYZtt4oc~P4xheREGPj~Vjk-5c3J8IOpEahGaRnTE~fLx~yyhTLPD-pY5HsD~-GsXR-hLzwPOd~Sf~20FP0QzMnhn8h5tC~zJTQ3-4OzDjm-LVXAn8oj9YT1JJDbaFS~xIM3XmWXgQy-q1PXB5qWV0hVeQ1HRspdAzTzOM93w8qJQEJit8LtNd3UhK-JsL08tQFUGdna2TBu1HaXC~ytm8pxElTRxo5Fr02v6eWxdbVjNX0n3LJxxEFjGN8C1rLz7mOY2IgfBsSIEqMoQlTT8H541uGFg__')`,
             }}
@@ -116,7 +116,7 @@ function About({language}) {
         <div>
           <section
             id="About"
-            className="py-20 bg-gray-100 relative bg-fixed bg-cover bg-center"
+            className="py-[5rem] bg-gray-100 relative bg-fixed bg-cover bg-center"
             style={{
               backgroundImage: `url('https://s3-alpha-sig.figma.com/img/dc56/57b7/b07aed81b1591546102e48ee2f630480?Expires=1734307200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=hue1hbySbfv6EL3jinz~vpMemW8ZuMr9Leo4aqRM~j0-rLiOG7D-DGtXGCYZtt4oc~P4xheREGPj~Vjk-5c3J8IOpEahGaRnTE~fLx~yyhTLPD-pY5HsD~-GsXR-hLzwPOd~Sf~20FP0QzMnhn8h5tC~zJTQ3-4OzDjm-LVXAn8oj9YT1JJDbaFS~xIM3XmWXgQy-q1PXB5qWV0hVeQ1HRspdAzTzOM93w8qJQEJit8LtNd3UhK-JsL08tQFUGdna2TBu1HaXC~ytm8pxElTRxo5Fr02v6eWxdbVjNX0n3LJxxEFjGN8C1rLz7mOY2IgfBsSIEqMoQlTT8H541uGFg__')`,
             }}
