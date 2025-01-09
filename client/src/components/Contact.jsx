@@ -80,7 +80,7 @@ export default function Contact({ language }) {
       {language === "en" ? (
         <section
           id="Contact"
-          className="py-8 md:px-18 bg-gradient-to-r from-white via-white to-blue-500"
+          className="py-8 md:px-20 bg-gradient-to-r from-white via-white to-blue-500"
         >
           <div className="container grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Side - Contact Form */}
