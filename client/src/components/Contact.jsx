@@ -210,7 +210,7 @@ export default function Contact({ language }) {
           </div>
           {/* Social Icons */}
           <div className="flex flex-col items-end justify-end gap-4">
-            <div className="flex flex-row lg:flex-row md:flex-col gap-4">
+            <div className="flex lg:flex-row gap-4">
               <a
                 href="#"
                 className="w-10 h-10 lg:w-12 lg:h-12 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-white hover:bg-gray-100 transition-all shadow-md"
@@ -387,9 +387,9 @@ export default function Contact({ language }) {
           </div>
 
           {/* Social Icons */}
-          <div className="flex flex-col items-start justify-start gap-4">
-            <div className="flex flex-row lg:flex-row md:flex-col gap-4">
-              <a
+          <div className="flex flex-col items-end justify-end gap-4">
+          <div className="flex lg:flex-row gap-4">
+          <a
                 href="#"
                 className="w-10 h-10 lg:w-12 lg:h-12 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-white hover:bg-gray-100 transition-all shadow-md"
               >
