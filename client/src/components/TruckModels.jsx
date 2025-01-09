@@ -2,6 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import TruckModelsCarousel from "./TruckModelsCarousel";
 import { TruckModel } from "../api/api";
+import '../App.css'
 
 const TruckModels = ({ language }) => {
   const [truckModels, setTruckModels] = useState([]);
@@ -30,7 +31,7 @@ const TruckModels = ({ language }) => {
             {/* Title with Horizontal Lines */}
             <div className="flex items-center justify-center mb-6">
               <div className="h-px w-1/5 bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
-              <h2 className="text-center text-3xl font-bold mx-4">
+              <h2 className="text-center text-3xl font-bold mx-4 font-oswald ">
                 Truck Models
               </h2>
               <div className="h-px w-1/5 bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>

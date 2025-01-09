@@ -1,5 +1,6 @@
 import Home from "./components/LandingPage";
 import { Toaster } from "react-hot-toast";
+// import './App.css'
 
 function App() {
   return (

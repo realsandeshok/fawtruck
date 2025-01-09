@@ -48,7 +48,7 @@ function Footer({ language }) {
 
                 {/* Navigation Links */}
                 <div className="flex flex-col items-center md:items-start">
-                  <h3 className="font-bold text-lg mb-4">Sections</h3>
+                  <h3 className="font-bold text-lg mb-4 font-oswald">Sections</h3>
                   <a href="#" className="hover:text-gray-300 mb-2">
                     Home
                   </a>
@@ -65,7 +65,7 @@ function Footer({ language }) {
 
                 {/* Company Info */}
                 <div className="flex flex-col md:items-start items-center">
-                  <h3 className="font-bold text-lg mb-4">Contacts</h3>
+                  <h3 className="font-bold text-lg mb-4 font-oswald">Contacts</h3>
                   <p className="mb-2">rasheed.hassan@fakhro.com</p>
                   <p className="mb-2">+966 55 280 3657</p>
                   <p>
@@ -79,7 +79,7 @@ function Footer({ language }) {
 
                 {/* Social Links */}
                 <div className="flex flex-col items-center justify-center gap-4">
-                  <h1 className="text-3xl md:text-3xl lg:text-4xl font-bold">
+                  <h1 className="text-3xl md:text-3xl lg:text-4xl font-bold font-oswald">
                     Follow Us
                   </h1>
                   <div className="flex flex-row lg:flex-row md:flex-col gap-4">

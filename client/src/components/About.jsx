@@ -90,7 +90,7 @@ function About({language}) {
                   variants={fadeInUpVariant}
                   className="mx-w-[500px]"
                 >
-                  <h2 className="text-left text-3xl font-bold mb-2 text-white">
+                  <h2 className="text-left text-3xl font-bold mb-2 text-white font-oswald">
                     About Us
                   </h2>
                   <p className="text-left text-gray-200 mb-2 pb-4">
@@ -164,7 +164,7 @@ function About({language}) {
                     alt="Foton Trucks - High Energy Sales"
                     width={500}
                     height={200}
-                    className="rounded-lg"
+                    className="rounded-lg px-8 md:px-0 md:pr-4"
                   />
                 </motion.div>
               </div>
