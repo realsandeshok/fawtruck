@@ -1,11 +1,12 @@
 import { useState } from "react"
 import { cn } from "../../../lib/utils"
-import { Button } from "../../ui/button"
+import { Button } from "../../ui/reg_button"
 import { Card, CardContent } from "../../ui/card"
 import { Input } from "../../ui/input"
 import { Label } from "../../ui/label"
 import toast from "react-hot-toast" // Import toast
 import { AdminLogin } from "../../../api/api"
+import truckimg from '../../../assets/Images/truckModel-1.png'
 
 export function LoginForm({
   className,
@@ -17,9 +18,9 @@ export function LoginForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     const userData = { username, password };
-  
+
     try {
       const response = await fetch(AdminLogin, {
         method: "POST",
@@ -28,26 +29,26 @@ export function LoginForm({
         },
         body: JSON.stringify(userData),
       });
-    
+
       console.log("Response Status:", response.status);
-    
+
       if (!response.ok) {
         throw new Error("Invalid username or password.");
       }
-    
+
       const data = await response.json();
       console.log("Response Data:", data);
-    
+
       // Ensure token exists
       if (!data.token) {
         throw new Error("Missing token in response.");
       }
-    
+
       localStorage.setItem("token", data.token);
-    
+
       // Show success toast
       toast.success("Login successful!", { duration: 3000 });
-    
+
       // Delay redirection to allow toast to display
       setTimeout(() => {
         window.location.href = "/banner";
@@ -55,22 +56,22 @@ export function LoginForm({
     }
     catch (err: unknown) {
       let errorMessage = "An unexpected error occurred.";
-  
+
       // Handle specific error scenarios
       if (err instanceof Error) {
         errorMessage = err.message;
       }
-  
+
       // Show error toast
       toast.error(errorMessage, {
         duration: 3000,
       });
-  
+
       // Optionally set the error message for UI display
       setErrorMessage(errorMessage);
     }
   };
-  
+
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -117,7 +118,7 @@ export function LoginForm({
           </form>
           <div className="relative hidden bg-muted md:block">
             <img
-              src="https://thumbs.dreamstime.com/b/american-style-truck-freeway-pulling-load-transportation-theme-road-cars-174771780.jpg"
+              src={`${truckimg}`}
               alt="Image"
               className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
             />
