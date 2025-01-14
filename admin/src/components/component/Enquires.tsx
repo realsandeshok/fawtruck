@@ -3,6 +3,14 @@ import { Eye } from "lucide-react";
 import toast from "react-hot-toast";
 import { Enquiries } from "../../api/api";
 import Layout from "./Layout";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../ui/pagination"; // Import pagination components
 
 interface Enquiry {
   id: number;
@@ -19,6 +27,9 @@ const Enquires = () => {
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [selectedEnquiry, setSelectedEnquiry] = useState<Enquiry | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1); // State for the current page
+  const [itemsPerPage] = useState(13);
 
   useEffect(() => {
     const fetchEnquiries = async () => {
@@ -75,34 +86,102 @@ const Enquires = () => {
     return new Date(date).toLocaleDateString(undefined, options);
   };
 
+  // Calculate the total pages based on the enquiries length
+  const totalPages = Math.ceil(enquiries.length / itemsPerPage);
+
+  // Get current page enquiries (slice the data to show only the current page's records)
+  const currentPageEnquiries = enquiries.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    if (page > 0 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
   return (
     <Layout>
       <div className="p-6">
-        <h1 className="text-2xl font-bold mb-4">Enquiries</h1>
-       
-          <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-300">
-              <thead>
-                <tr className="bg-gray-200 text-gray-700">
-                  {/* <th className="px-4 py-2 text-left">ID</th> */}
-                  <th className="px-6 py-3 text-left">Name</th>
-                  <th className="px-6 py-3 text-left">Country</th>
-                  <th className="px-6 py-3 text-left">Contact</th>
-                  <th className="px-6 py-3 text-left">Email</th>
-                  <th className="px-6 py-3 text-left">Message</th>
-                  <th className="px-6 py-3 text-left">Date</th>
-                  <th className="px-6 py-3 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+        <div className="flex">
 
-                {enquiries.length === 0 ? (
-          <tr>
-            <td colSpan={8} className="text-center py-4 h-[75vh]">
-              No enquiries found.
-            </td>
-          </tr>) : (
-                enquiries.map((enquiry) => (
+
+          <h1 className="text-2xl font-bold mb-4">Enquiries</h1>
+          <Pagination>
+            <PaginationContent className="flex justify-end w-full px-6">
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handlePageChange(currentPage - 1);
+                  }}
+                  size="sm"
+                />
+              </PaginationItem>
+
+              {[...Array(totalPages)].map((_, index) => {
+                // Only render the current page number
+                if (currentPage === index + 1) {
+                  return (
+                    <PaginationItem key={index}>
+                      <PaginationLink
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handlePageChange(index + 1);
+                        }}
+                        size="sm"
+                        // className="bg-blue-500 text-white border-2 border-blue-600 py-2 px-3 rounded-md"
+                      >
+                        {index + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                }
+                return null; // Hide other page numbers
+              })}
+
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handlePageChange(currentPage + 1);
+                  }}
+                  size="sm"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-300">
+            <thead>
+              <tr className="bg-gray-200 text-gray-700">
+                {/* <th className="px-4 py-2 text-left">ID</th> */}
+                <th className="px-6 py-3 text-left">Name</th>
+                <th className="px-6 py-3 text-left">Country</th>
+                <th className="px-6 py-3 text-left">Contact</th>
+                <th className="px-6 py-3 text-left">Email</th>
+                <th className="px-6 py-3 text-left">Message</th>
+                <th className="px-6 py-3 text-left">Date</th>
+                <th className="px-6 py-3 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              {currentPageEnquiries.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="text-center py-4 h-[75vh]">
+                    No enquiries found.
+                  </td>
+                </tr>) : (
+                currentPageEnquiries.map((enquiry) => (
                   <tr key={enquiry.id} className="border-t hover:bg-gray-100">
                     {/* <td className="px-4 py-2">{enquiry.id}</td> */}
                     <td className="px-4 py-2">{enquiry.name}</td>
@@ -123,10 +202,12 @@ const Enquires = () => {
                     </td>
                   </tr>
                 )))}
-              </tbody>
-            </table>
-          </div>
-        
+            </tbody>
+          </table>
+        </div>
+
+
+
 
         {isDialogOpen && selectedEnquiry && (
           <div
@@ -173,6 +254,7 @@ const Enquires = () => {
           </div>
         )}
       </div>
+
     </Layout>
   );
 };

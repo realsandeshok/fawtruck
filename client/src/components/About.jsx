@@ -2,6 +2,7 @@ import { motion, useAnimation } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import MyImage from "../assets/1.png"; // Adjust the path as needed
+import about_bg from '../assets/1_1.png'
 import { AboutContent } from "../api/api";
 
 function About({language}) {
@@ -56,12 +57,12 @@ function About({language}) {
       {language === "en" ? (
         <div>
           <section
-            id="About"
-            className="py-[5rem] bg-gray-100 relative bg-fixed bg-cover bg-center"
-            style={{
-              backgroundImage: `url('https://s3-alpha-sig.figma.com/img/dc56/57b7/b07aed81b1591546102e48ee2f630480?Expires=1734307200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=hue1hbySbfv6EL3jinz~vpMemW8ZuMr9Leo4aqRM~j0-rLiOG7D-DGtXGCYZtt4oc~P4xheREGPj~Vjk-5c3J8IOpEahGaRnTE~fLx~yyhTLPD-pY5HsD~-GsXR-hLzwPOd~Sf~20FP0QzMnhn8h5tC~zJTQ3-4OzDjm-LVXAn8oj9YT1JJDbaFS~xIM3XmWXgQy-q1PXB5qWV0hVeQ1HRspdAzTzOM93w8qJQEJit8LtNd3UhK-JsL08tQFUGdna2TBu1HaXC~ytm8pxElTRxo5Fr02v6eWxdbVjNX0n3LJxxEFjGN8C1rLz7mOY2IgfBsSIEqMoQlTT8H541uGFg__')`,
-            }}
-          >
+  id="About"
+  className="py-[5rem] relative bg-fixed bg-cover bg-center"
+  style={{
+    backgroundImage: `url(${about_bg})`,
+  }}
+>
             <div className="absolute inset-0 bg-black opacity-80 z-0"></div>
             <div className="container mx-auto px-4 relative z-10">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center relative">

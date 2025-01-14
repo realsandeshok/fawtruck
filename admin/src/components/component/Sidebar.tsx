@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Truck, Info, PhoneCall } from 'lucide-react';
 
-import { Button } from '../ui/button';
+import { Button } from '../ui/reg_button';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 
