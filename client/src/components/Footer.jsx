@@ -16,7 +16,7 @@ import img1 from "../assets/img1.png";
 import logo2 from "../assets/logo2.png";
 import img2 from "../assets/Frame.png";
 
-function Footer({language}) {
+function Footer({ language }) {
   // const [language, setLanguage] = useState("en"); // Default to English
   // useEffect(() => {
   //   const currentPath = window.location.pathname; // Example: "/ar" for Arabic
@@ -48,7 +48,7 @@ function Footer({language}) {
 
                 {/* Navigation Links */}
                 <div className="flex flex-col items-center md:items-start">
-                  <h3 className="font-bold text-lg mb-4">Sections</h3>
+                  <h3 className="font-bold text-lg mb-4 font-oswald">Sections</h3>
                   <a href="#" className="hover:text-gray-300 mb-2">
                     Home
                   </a>
@@ -64,19 +64,22 @@ function Footer({language}) {
                 </div>
 
                 {/* Company Info */}
-                <div className="flex flex-col items-center md:items-start">
-                  <h3 className="font-bold text-lg mb-4">Contacts</h3>
+                <div className="flex flex-col md:items-start items-center">
+                  <h3 className="font-bold text-lg mb-4 font-oswald">Contacts</h3>
                   <p className="mb-2">rasheed.hassan@fakhro.com</p>
                   <p className="mb-2">+966 55 280 3657</p>
+                  <p>
+                    313, Dahiyah King Fahd,
+                  </p>
                   <p className="mb-2">
-                    313, Dahiyah King Fahd, Dammam 32314, Saudi Arabia
+                    Dammam 32314, Saudi Arabia
                   </p>
                   <p className="mb-2">Sun - Thu : 08:00 AM - 05:00 PM</p>
                 </div>
 
                 {/* Social Links */}
                 <div className="flex flex-col items-center justify-center gap-4">
-                  <h1 className="text-3xl md:text-3xl lg:text-4xl font-bold">
+                  <h1 className="text-3xl md:text-3xl lg:text-4xl font-bold font-oswald">
                     Follow Us
                   </h1>
                   <div className="flex flex-row lg:flex-row md:flex-col gap-4">
@@ -229,8 +232,11 @@ function Footer({language}) {
                   <h3 className="font-bold text-lg mb-4">جهات الاتصال</h3>
                   <p className="mb-2">rasheed.hassan@fakhro.com</p>
                   <p className="mb-2">+966 55 280 3657</p>
-                  <p className="mb-2 text-right">
-                    313, ضاحية الملك فهد, الدمام 32314, المملكة العربية السعودية
+                  <p className="mb-2 ">
+                    313,العربية السعودية
+                  </p>
+                  <p className="mb-2 ">
+                    ضاحية الملك فهد, الدمام 32314, المملكة
                   </p>
                   <p className="mb-2">
                     من الأحد إلى الخميس: 08:00 صباحًا - 05:00 مساءً

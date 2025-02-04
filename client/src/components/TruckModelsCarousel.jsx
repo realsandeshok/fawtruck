@@ -48,6 +48,9 @@ export default function TruckModelsCarousel({ language }) {
         settings: {
           slidesToShow: 2, // Show 2 slides at a time on tablets
           slidesToScroll: 1,
+          // centerMode: true, // Optional, centers the slides
+          // focusOnSelect: true, // Makes each slide focusable
+          // centerPadding: "20px", // Adds space between slides
         },
       },
       {
@@ -68,13 +71,13 @@ export default function TruckModelsCarousel({ language }) {
             {/* Carousel */}
             <Slider {...settings}>
               {truckModels.map((truck) => (
-                <div key={truck.id}>
-                  <div className="relative bg-gray-900 rounded-lg overflow-hidden group max-w-lg mx-auto">
+                <div key={truck.id} className="px-4 ">
+                  <div className="relative bg-gray-900 rounded-lg overflow-hidden group max-w-lg h-[18rem] mx-auto">
                     {/* Truck Image */}
                     <img
                       src={truck.image_url} // Use the image_url field from the API response
                       alt={truck.truck_name}
-                      className="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-[18rem] object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     {/* Overlay */}
                     <div className="absolute inset-0 bg-black bg-opacity-50 group-hover:bg-opacity-30 transition-all duration-300"></div>
@@ -94,13 +97,13 @@ export default function TruckModelsCarousel({ language }) {
             {/* Carousel */}
             <Slider {...settings}>
               {truckModels.map((truck) => (
-                <div key={truck.id}>
-                  <div className="relative bg-gray-900 rounded-lg overflow-hidden group max-w-lg mx-auto">
+                <div key={truck.id} className="px-4 ">
+                  <div className="relative bg-gray-900 rounded-lg overflow-hidden group max-w-lg mx-auto h-[18rem] ">
                     {/* Truck Image */}
                     <img
                       src={truck.image_url} // Use the image_url field from the API response
                       alt={truck.truck_name_ar}
-                      className="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-[18rem] object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     {/* Overlay */}
                     <div className="absolute inset-0 bg-black bg-opacity-50 group-hover:bg-opacity-30 transition-all duration-300"></div>

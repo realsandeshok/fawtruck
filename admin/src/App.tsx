@@ -1,11 +1,11 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import AboutUsPage from "./components/pages/about-us";
-import BannerPage from "./components/pages/banner";
-import TruckModelsPage from "./components/pages/truck-models";
+import { Routes, Route, Navigate, BrowserRouter } from "react-router-dom";
 import LoginPage from "./components/component/Login/page";
 import { Toaster } from "react-hot-toast";
-import { EnquiresPage } from "./components/pages/enquires";
 import { useEffect, useState } from "react";
+import AboutUs from "./components/component/AboutUs";
+import Banner from "./components/component/Banner";
+import TruckModels from "./components/component/TruckModels";
+import Enquires from "./components/component/Enquires";
 
 // PrivateRoute to handle protected routes
 function PrivateRoute({ children }: { children: JSX.Element }) {
@@ -45,7 +45,7 @@ function AppRoutes() {
         path="/about"
         element={
           <PrivateRoute>
-            <AboutUsPage />
+            <AboutUs/>
           </PrivateRoute>
         }
       />
@@ -53,7 +53,7 @@ function AppRoutes() {
         path="/banner"
         element={
           <PrivateRoute>
-            <BannerPage />
+            <Banner />
           </PrivateRoute>
         }
       />
@@ -61,7 +61,7 @@ function AppRoutes() {
         path="/truckmodels"
         element={
           <PrivateRoute>
-            <TruckModelsPage />
+            <TruckModels />
           </PrivateRoute>
         }
       />
@@ -69,7 +69,7 @@ function AppRoutes() {
         path="/enquires"
         element={
           <PrivateRoute>
-            <EnquiresPage />
+            <Enquires/>
           </PrivateRoute>
         }
       />
@@ -82,9 +82,9 @@ function App() {
   return (
     <>
       <Toaster />
-      <Router>
+      <BrowserRouter>
         <AppRoutes />
-      </Router>
+      </BrowserRouter>
     </>
   );
 }
