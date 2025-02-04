@@ -78,7 +78,7 @@ app.post("/enquiries", async (req, res) => {
 });
 
 // API to fetch all enquiries
-app.get("/enquiries", verifyAdmin, async (req, res) => {
+app.get("/enquiries", async (req, res) => {
   try {
     const query = "SELECT * FROM enquiries ORDER BY created_at DESC;";
     const result = await db.query(query);
